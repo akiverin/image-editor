@@ -1,33 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React, { useRef, useState } from 'react'
 import './App.css'
+import Modal from './components/modal/Modal.jsx'; 
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const inputFile = useRef(null);
+
+  const handleButtonClick = () => {
+    inputFile.current.click();
+  };
+
+  const handleImageChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setSelectedImage(e.target.result);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+      <h1>Обработка изображений</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
         <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
+          Отредактируйте изображение с вашего компьютера.
         </p>
       </div>
       <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+        Загрузите свое изображение
       </p>
+      <input ref={inputFile} style={{ display: 'none' }} type="file" accept="image/*" onChange={handleImageChange} />
+      <div className="actions">
+        <button onClick={handleButtonClick}>Открыть изображение</button>
+        <button onClick={openModal}>Открыть модальное окно</button>
+      </div>
+      {selectedImage && <img className="preview" src={selectedImage} alt="Uploaded"/>}
+      <Modal isOpen={modalIsOpen} onClose={closeModal}>
+        <p>Содержимое модального окна</p>
+      </Modal>
     </>
   )
 }
