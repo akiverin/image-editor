@@ -1,4 +1,4 @@
-#root {
+#wrapper {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
@@ -39,4 +39,16 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.add-link {
+  border-radius: 8px;
+  border: 1px solid #646cffaa;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  max-width: 40%;
+  width: 100%;
+  font-family: inherit;
+  transition: border-color 0.25s;
 }

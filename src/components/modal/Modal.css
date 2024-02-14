@@ -17,7 +17,6 @@
     border-radius: 8px;
     margin: 15% auto;
     padding: 20px;
-    border: 1px solid #888;
     width: 80%;
     animation: scaleIn 0.4s ease;
   }
@@ -52,3 +51,15 @@
     to { transform: scale(1); }
   }
   
+  @media (prefers-color-scheme: light) {
+    .modal-content {
+      color: #000000;
+      background-color: #eaeaea;
+    }
+    a:hover {
+      color: #747bff;
+    }
+    button {
+      background-color: #f9f9f9;
+    }
+  }

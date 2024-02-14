@@ -1,0 +1,13 @@
+.button-icon {
+    padding: 0.4em;
+    line-height: 1;
+    /* font-size: 0.9em; */
+    background-color: #111111;
+}
+
+@media (prefers-color-scheme: light) {
+    .button-icon {
+      color: #213547;
+      background-color: #f0f0f0;
+    }
+  }
