@@ -4,17 +4,18 @@ import './Editor.css';
 
 import ButtonIcon from '../../components/ButtonIcon/ButtonIcon'
 
-const Editor = ({imageData}) => {
+const Editor = () => {
     const { image, setImage } = useContext(ImageContext);
+
+    const [pipetteActive, setPipetteActive] = useState(false);
     const [pipetteColor, setPipetteColor] = useState("");
+    const [cursor, setCursor] = useState({x: 0, y: 0});
 
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [fileSize, setFileSize] = useState(0);
-    const [naturalWidth, setNaturalWidth] = useState(0);
-    const [colorDepth, setColorDepth] = useState(0);
-    const [date, setDate] = useState(null);
-    
+    const [scaleFactor, setScaleFactor] = useState(1);
+
     const imageObj = new Image();
     imageObj.src = image;
     
@@ -24,29 +25,37 @@ const Editor = ({imageData}) => {
     useEffect(() => {
         if (!image) return;
 
+        const workspace = document.querySelector('.workspace');
+        const workspaceWidth = workspace.offsetWidth;
+        const workspaceHeight = workspace.offsetHeight;
+        const maxWidth = workspaceWidth - 100;
+        const maxHeight = workspaceHeight - 100;
+        
+        const widthScale = maxWidth / imageObj.width;
+        const heightScale = maxHeight / imageObj.height;
+        setScaleFactor(Math.min(widthScale, heightScale));
+        console.log(scaleFactor)
+        const scaledWidth = imageObj.width * scaleFactor;
+        const scaledHeight = imageObj.height * scaleFactor;
+        console.log(maxWidth,maxHeight,widthScale,heightScale, scaleFactor)
+
         imageObj.crossOrigin = 'anonymous';
-
         const canvasElement = canvas.current;
-        canvasElement.width = imageObj.width;
-        canvasElement.height = imageObj.height;
-
         context.current = canvasElement.getContext('2d');
-        context.current.drawImage(imageObj, 0, 0);
+
+        canvasElement.width = workspaceWidth;
+        canvasElement.height = workspaceHeight;
+        context.current.drawImage(imageObj, (maxWidth - scaledWidth) / 2 + 50, (maxHeight - scaledHeight) / 2 + 50, scaledWidth, scaledHeight);
+        setWidth(scaledWidth);
+        setHeight(scaledHeight);
 
         imageObj.onload = () => {
-            setWidth(imageObj.width);
-            setHeight(imageObj.height);
+            // setWidth(imageObj.width);
+            // setHeight(imageObj.height);
             setFileSize(Math.floor(imageObj.src.length/1024*0.77));
-            setNaturalWidth(imageObj.naturalWidth);
-
-            const imageData = context.current.getImageData(0, 0, imageObj.width, imageObj.height);
-            const colorDepth = imageData.data.length / (imageObj.width * imageObj.height);
-            setColorDepth(colorDepth);
-
-            setDate(imageObj.lastModified);
         };
 
-    }, [image]);
+    }, [image, scaleFactor]);
 
     const handleCanvasClick = (event) => {
         const canvasRef = canvas.current;
@@ -55,48 +64,87 @@ const Editor = ({imageData}) => {
         const y = event.nativeEvent.offsetY;
         const pixelData = context.getImageData(x, y, 1, 1).data;
         const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
-        console.log('Выбранный цвет:', color);
-        setPipetteColor(color);
-      };
+        pipetteActive && console.log('Выбранный цвет:', color);
+        pipetteActive && setPipetteColor(color);
+    };
+
+    function handleMouseMove(e) {
+        const rect = canvas.current.getBoundingClientRect();
+        setCursor({
+           x: e.clientX - rect.left,  
+           y: e.clientY - rect.top
+        });
+    }
+
+    const handleDownload = () => {
+        const url = canvas.current.toDataURL();
+        console.log(url)
+        const a = document.createElement('a');
+        document.body.appendChild(a);
+        a.href = url;
+        a.download = 'canvas.png';
+        a.click();
+        document.body.removeChild(a);
+    };
+
+    const handleScaleChange = (event) => {
+        const newScaleFactor = parseFloat(event.target.value);
+        setScaleFactor(newScaleFactor);
+        const scaledWidth = imageObj.width * scaleFactor;
+        const scaledHeight = imageObj.height * scaleFactor;
+        const canvasElement = canvas.current;
+        canvasElement.width = scaledWidth;
+        canvasElement.height = scaledHeight;
+        context.current.drawImage(imageObj, (maxWidth - scaledWidth) / 2, (maxHeight - scaledHeight + 50) / 2, scaledWidth, scaledHeight);
+
+    };
 
     return (
         <section className="editor">
             <div className="editor__menu-bar">
-                <ButtonIcon>
-                    Файл
+                <ButtonIcon link="/">
+                    Главная
+                </ButtonIcon>
+                <ButtonIcon title="Скачать" onClick={handleDownload}>
+                    Скачать
                 </ButtonIcon>
             </div>
             <div className="editor__tool-panel tool-panel">
-                <ButtonIcon title="Пипетка">
-                    <svg className="tool-panel__icon" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><title/><path d="M90,24.0217a17.9806,17.9806,0,0,0-5.2969-12.7968,18.5331,18.5331,0,0,0-25.6054,0L46.23,24.0972,41.9121,19.78a5.9994,5.9994,0,1,0-8.4844,8.4844l4.3184,4.3184L7.7578,62.5647A5.9956,5.9956,0,0,0,6,66.8069V83.9221a5.9966,5.9966,0,0,0,6,6H29.1152a5.9956,5.9956,0,0,0,4.2422-1.7578L63.34,58.176l4.3184,4.3184A5.9994,5.9994,0,0,0,76.1426,54.01L71.825,49.6924,84.6973,36.8245A17.9861,17.9861,0,0,0,90,24.0217Zm-63.3691,53.9H18V69.2913L46.2305,41.0667l8.625,8.625Z"/></svg>
+                <ButtonIcon title="Пипетка" onClick={()=>{setPipetteActive(false)}} active={!pipetteActive}>
+                    <svg className="tool-panel__icon"  role="img" fill="currentColor" viewBox="0 0 18 18" id="SSelect18N-icon" width="18" height="18" aria-hidden="true" aria-label="" focusable="false"><path fillRule="evenodd" d="M4.252,1.027A.25.25,0,0,0,4,1.277V17.668a.25.25,0,0,0,.252.25.246.246,0,0,0,.175-.074L9.262,13h6.5a.25.25,0,0,0,.176-.427L4.427,1.1A.246.246,0,0,0,4.252,1.027Z"></path></svg>                </ButtonIcon>
+                <ButtonIcon title="Пипетка" onClick={()=>{setPipetteActive(!pipetteActive)}} active={pipetteActive}>
+                    <svg className="tool-panel__icon" role="img" fill="currentColor" viewBox="0 0 18 18" id="SSampler18N-icon" width="18" height="18" aria-hidden="true" aria-label="" focusable="false"><path fillRule="evenodd" d="M11.228,8.519,4.116,15.631a1.235,1.235,0,1,1-1.747-1.747L9.481,6.772Zm3.636-7.466a1.8,1.8,0,0,0-1.273.527L11.328,3.843l-.707-.707a.5.5,0,0,0-.707,0L8.234,4.817a.5.5,0,0,0,0,.707l.54.54L1.662,13.177a2.235,2.235,0,1,0,3.161,3.161l7.113-7.112.54.54a.5.5,0,0,0,.707,0l1.681-1.68a.5.5,0,0,0,0-.707l-.707-.707L16.42,4.409a1.8,1.8,0,0,0,0-2.546l-.283-.283a1.8,1.8,0,0,0-1.273-.527Z"></path></svg>
                 </ButtonIcon>
             </div>
             <div className="editor__workspace workspace">
-                <canvas className="workspace__canvas" ref={canvas} onClick={handleCanvasClick} />
+                <canvas className={pipetteActive?"workspace__canvas workspace__canvas--pipette":"workspace__canvas"} ref={canvas} onClick={handleCanvasClick}  onMouseMove={handleMouseMove} />
             </div>
             {image &&
                 <div className="editor__status-bar status-bar">
                     <span>
                         Разрешение: {width} x {height} пикселей 
                     </span>
-
-                    <span>
-                        Естественное разрешение: {naturalWidth} ппи
-                    </span>
-
                     <span>
                         Размер файла: {fileSize} Кбайт
                     </span>
-
-                    <span>
-                        Глубина цвета: {colorDepth}
+                    {pipetteActive &&
+                        <>
+                            <span>
+                                Цвет: {pipetteColor}
+                            </span>
+                            <div className="status-bar__color" style={{backgroundColor: pipetteColor}}></div>
+                        </>
+                    }
+                    <input
+                        type="range"
+                        min="12"
+                        max="300"
+                        value={scaleFactor * 100}
+                        onChange={handleScaleChange}
+                    />
+                    <span className="coordinates">
+                        Координаты: x {cursor.x}; y {cursor.y}
                     </span>
-
-                    <span>
-                        Дата загрузки: {date ? new Date(date).toLocaleString() : ''}
-                    </span>
-
-                    <div className="status-bar__color" style={{backgroundColor: pipetteColor}}></div>
                 </div>
             }
         </section>

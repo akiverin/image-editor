@@ -20,15 +20,21 @@ const Home = () => {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                setImage(e.target.result);
+              const base64Image = e.target.result;
+              setImage(base64Image);
             };
             reader.readAsDataURL(input.files[0]);
         } else {
             const imageUrl = imageLink;
-            console.log(imageUrl)
-            setImageLink(imageUrl);
-            fetch(imageUrl).then(response => {
-                setImage(response.url);
+            console.log(imageUrl);
+            fetch(imageUrl)
+            .then(response => response.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    setImage(e.target.result);
+                };
+                reader.readAsDataURL(blob);
             });
         }
     };
