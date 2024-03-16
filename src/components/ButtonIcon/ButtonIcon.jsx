@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import './ButtonIcon.css';
 
 const ButtonIcon = ({ title, children, onClick, active, link }) => {
@@ -21,6 +22,14 @@ const ButtonIcon = ({ title, children, onClick, active, link }) => {
       {children}
     </Link>
   );
+};
+
+ButtonIcon.propTypes = {
+  title: PropTypes.string,
+  children: PropTypes.node,
+  onClick: PropTypes.func,
+  active: PropTypes.bool,
+  link: PropTypes.string,
 };
 
 export default ButtonIcon;

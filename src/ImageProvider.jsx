@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react';
-
+import PropTypes from 'prop-types';
 export const ImageContext = createContext();
 
 export const ImageProvider = ({children}) => {
@@ -11,3 +11,7 @@ export const ImageProvider = ({children}) => {
     </ImageContext.Provider>
   )
 }
+
+ImageProvider.propTypes = {
+  children: PropTypes.node,
+};

@@ -5,11 +5,18 @@ import './Home.css';
 import { Link } from 'react-router-dom';
 
 const Home = () => {
-    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [linkOpen, setLinkOpen] = useState(false);
     const { image, setImage } = useContext(ImageContext);
     const [imageLink, setImageLink] = useState("");
     const inputFile = useRef(null);
+    // Работа с модальны окном
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
     const handleButtonClick = () => {
         inputFile.current.click();
@@ -38,14 +45,6 @@ const Home = () => {
             });
         }
     };
-
-    const openModal = () => {
-        setModalIsOpen(true);
-    };
-    const closeModal = () => {
-        setModalIsOpen(false);
-    };
-
     return (
         <section className="home" id="wrapper">
             <h1>Обработка изображений</h1>
@@ -60,7 +59,7 @@ const Home = () => {
             <input ref={inputFile} style={{ display: 'none' }} type="file" accept="image/*" onChange={handleImageChange} />
             <div className="actions">
                 <button onClick={handleButtonClick}>Открыть изображение</button>
-                {/* <button onClick={openModal}>Открыть модальное окно</button> */}
+                <button onClick={openModal}>Открыть модальное окно</button>
                 <button onClick={()=>setLinkOpen(!linkOpen)}>{!linkOpen?"Загрузить":"Закрыть загрузку"} ссылкой изображение</button>
             </div>
             {linkOpen && 
@@ -90,7 +89,7 @@ const Home = () => {
                     }}>Перейти в редактор</Link>
                 </div>
             }
-            <Modal isOpen={modalIsOpen} onClose={closeModal}>
+            <Modal isOpen={isModalOpen} onClose={closeModal} title="Главная модальное окно">
                 <p>Содержимое модального окна</p>
             </Modal>
         </section>

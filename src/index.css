@@ -11,6 +11,13 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --dark-bg: rgb(29, 29, 29);
+  --dark-gray: rgb(50, 50, 50);
+  --dark-drop: rgb(38, 38, 38);
+  --dark-drophover: rgb(63, 63, 63);
+  --light-gray: rgb(213, 213, 213);
+  --light-bg: rgb(248, 248, 248);
 }
 
 #root {

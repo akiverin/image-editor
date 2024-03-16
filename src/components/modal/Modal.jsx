@@ -1,48 +1,37 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import './Modal.css';
 
-const Modal = ({ isOpen, onClose, children }) => {
-
-    const closeModal = useCallback(() => {
-        onClose();
-      }, [onClose]);
-    
-      const handleEscape = useCallback((event) => {
-        if (event.keyCode === 27) {
-          closeModal();
-        }
-      }, [closeModal]);
-    
-      useEffect(() => {
-        if (isOpen) {
-          document.addEventListener('keydown', handleEscape, false); 
-        } else {
-          document.removeEventListener('keydown', handleEscape, false); 
-        }
-    
-        return () => {
-          document.removeEventListener('keydown', handleEscape, false);
-        };
-      }, [isOpen, handleEscape,]);
-
-      const handleOutsideClick = useCallback((event) => {
-        if (!event.target.closest('.modal-content')) { 
-          closeModal();
-        }
-      }, [closeModal]);
+const Modal = ({ isOpen, onClose, title, children }) => {
+  const dialogRef = useRef(null);
+  useEffect(() => {
+    if (isOpen) {
+      dialogRef.current?.showModal();
+    } else {
+      dialogRef.current?.close();
+    }
+  }, [isOpen]);
 
   return (
     <>
-      {isOpen && (
-        <div className="modal" onClick={handleOutsideClick}>
-          <div className="modal-content">
-            <span className="close" onClick={closeModal}>&times;</span>
-            {children}
-          </div>
+      <dialog className="modal" ref={dialogRef} onCancel={onClose}>
+        <div className="modal__head">
+          <h2 className='modal__title'>{title}</h2>
+          <button className="modal__close" onClick={onClose}>&#x2715;</button>
         </div>
-      )}
+        <div className="modal__body">
+          {children}
+        </div>
+      </dialog>
     </>
   );
+};
+
+Modal.propTypes = {
+  isOpen: PropTypes.bool,
+  children: PropTypes.node,
+  title: PropTypes.string,
+  onClose: PropTypes.func,
 };
 
 export default Modal;

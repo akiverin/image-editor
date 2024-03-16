@@ -1,4 +1,4 @@
-.button-icon {
+.button {
     padding: 0.5em;
     line-height: 0.8;
     border-radius: 5px;
@@ -16,13 +16,20 @@
     }
 }
 
-.button-icon--active {
-  border: 1px solid #adadad;
-  background-color: #111111;
+.button--accent {
+  border: none;
+  border-radius: 100px;
+  background-color: #f5731d;
+  color: white;
+  padding: 12px 24px;
+  font-weight: 600;
+  &:hover {
+    background-color: #df6d21;
+  }
 }
 
 @media (prefers-color-scheme: light) {
-    .button-icon {
+    .button {
       color: #213547;
       background-color: #e4e4e400;
       &:hover {
@@ -30,9 +37,5 @@
         background-color: #e7e7e7aa;
         border-color: #353535;
       }
-    }
-    .button-icon--active {
-      border: 1px solid #adadad;
-      background-color: #d4d4d4;
     }
   }
