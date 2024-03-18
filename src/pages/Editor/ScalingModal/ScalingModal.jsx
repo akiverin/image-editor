@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './ScalingModal.css';
 import PropTypes from 'prop-types';
 import Dropdown from '@components/Dropdown/Dropdown';
 import Input from '@components/Input/Input';
 import TheButton from '@components/Button/TheButton';
+import { ImageContext } from '@/ImageProvider';
 import nearestNeighborInterpolation from '@utils/ImageProcessing/NearestNeighborInterpolation';
 
-const ScalingModal = ({ image, scaleFactor, setImage, closeModal }) => {
+const ScalingModal = ({ image, scaleFactor, closeModal }) => {
+    const { setImage } = useContext(ImageContext);
     const [resizeMode, setResizeMode] = useState('percent');
     const [width, setWidth] = useState('');
     const [height, setHeight] = useState('');

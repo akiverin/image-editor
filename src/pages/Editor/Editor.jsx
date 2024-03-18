@@ -9,7 +9,7 @@ import ScalingModal from './ScalingModal/ScalingModal';
 
 const Editor = () => {
     const { image, setImage } = useContext(ImageContext);
-    
+
     const [pipetteActive, setPipetteActive] = useState(false);
     const [pipetteColor, setPipetteColor] = useState("");
     const [cursor, setCursor] = useState({ x: 0, y: 0 });
@@ -42,37 +42,38 @@ const Editor = () => {
 
     useEffect(() => {
         if (!image) return;
-
+      
+        const imageObj = new Image();
+        imageObj.src = image;
+        imageObj.crossOrigin = 'anonymous';
+      
         const workspace = document.querySelector('.workspace');
         const workspaceWidth = workspace.offsetWidth;
         const workspaceHeight = workspace.offsetHeight;
         const maxWidth = workspaceWidth - 100;
         const maxHeight = workspaceHeight - 100;
-        const widthScale = maxWidth / imageObj.width;
-        const heightScale = maxHeight / imageObj.height;
-        const newScaleFactor = Math.min(widthScale, heightScale);
-        scaleFactor !== 0 || setScaleFactor(newScaleFactor);
-        const scaledWidth = imageObj.width * scaleFactor;
-        const scaledHeight = imageObj.height * scaleFactor;
-
-        imageObj.crossOrigin = 'anonymous';
-        const canvasElement = canvas.current;
-        context.current = canvasElement.getContext('2d');
-
-        canvasElement.width = workspaceWidth;
-        canvasElement.height = workspaceHeight;
-        context.current.drawImage(imageObj, (maxWidth - scaledWidth) / 2 + 50, (maxHeight - scaledHeight) / 2 + 50, scaledWidth, scaledHeight);
-        setWidth(scaledWidth);
-        setHeight(scaledHeight);
-
-        const newImageObj = new Image();
-        newImageObj.src = image;
-        newImageObj.onload = () => {
-            setSelectOption(Math.round(newScaleFactor * 100));
-            setFileSize(Math.floor(imageObj.src.length / 1024 * 0.77));
+      
+        imageObj.onload = () => {
+          const widthScale = maxWidth / imageObj.width;
+          const heightScale = maxHeight / imageObj.height;
+          const newScaleFactor = Math.min(widthScale, heightScale);
+          scaleFactor !== 0 || setScaleFactor(newScaleFactor);
+          const scaledWidth = imageObj.width * scaleFactor;
+          const scaledHeight = imageObj.height * scaleFactor;
+      
+          const canvasElement = canvas.current;
+          context.current = canvasElement.getContext('2d');
+      
+          canvasElement.width = workspaceWidth;
+          canvasElement.height = workspaceHeight;
+          context.current.drawImage(imageObj, (maxWidth - scaledWidth) / 2 + 50, (maxHeight - scaledHeight) / 2 + 50, scaledWidth, scaledHeight);
+          setWidth(scaledWidth);
+          setHeight(scaledHeight);
+      
+          setSelectOption(Math.round(newScaleFactor * 100));
+          setFileSize(Math.floor(imageObj.src.length / 1024 * 0.77));
         };
-
-    }, [image, scaleFactor]);
+      }, [image, scaleFactor]);
 
     const handleCanvasClick = (event) => {
         const canvasRef = canvas.current;
