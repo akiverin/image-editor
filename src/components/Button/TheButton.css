@@ -38,4 +38,14 @@
         border-color: #353535;
       }
     }
+    .button--accent {
+      background-color: #f5731d;
+      color: white;
+      padding: 12px 24px;
+      font-weight: 600;
+      &:hover {
+        background-color: #df6d21;
+        color: white;
+      }
+    }
   }

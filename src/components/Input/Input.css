@@ -15,3 +15,20 @@
         border-color: rgb(67, 67, 67);
     }
 }
+
+@media (prefers-color-scheme: light) {
+    .input {
+        border: 1px solid rgb(144, 144, 144);
+        color: black;
+        background-color: white;
+        transition: all .13s ease-in-out;
+        &:hover {
+            color: black;
+            border-color: rgb(109, 109, 109);
+        }
+        &:focus {
+            outline: 1.5px;
+            border-color: rgb(34, 34, 34);
+        }
+    }
+}

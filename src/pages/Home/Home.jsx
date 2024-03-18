@@ -59,7 +59,7 @@ const Home = () => {
             <input ref={inputFile} style={{ display: 'none' }} type="file" accept="image/*" onChange={handleImageChange} />
             <div className="actions">
                 <button onClick={handleButtonClick}>Открыть изображение</button>
-                <button onClick={openModal}>Открыть модальное окно</button>
+                <button onClick={openModal}>Информация об авторе</button>
                 <button onClick={()=>setLinkOpen(!linkOpen)}>{!linkOpen?"Загрузить":"Закрыть загрузку"} ссылкой изображение</button>
             </div>
             {linkOpen && 
@@ -89,8 +89,8 @@ const Home = () => {
                     }}>Перейти в редактор</Link>
                 </div>
             }
-            <Modal isOpen={isModalOpen} onClose={closeModal} title="Главная модальное окно">
-                <p>Содержимое модального окна</p>
+            <Modal isOpen={isModalOpen} onClose={closeModal} title="Об авторе">
+                <p>Работа выполнена Кивериным А.А.</p>
             </Modal>
         </section>
     )

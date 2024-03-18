@@ -1,14 +1,15 @@
 import React, { useRef, useContext, useEffect, useState } from 'react';
-import { ImageContext } from '../../ImageProvider';
+import { ImageContext } from '@/ImageProvider';
 import './Editor.css';
 
-import ButtonIcon from '../../components/ButtonIcon/ButtonIcon'
-import Modal from '../../components/modal/Modal';
-import Dropdown from '../../components/Dropdown/Dropdown';
+import ButtonIcon from '@components/ButtonIcon/ButtonIcon'
+import Modal from '@components/modal/Modal';
+import Dropdown from '@components/Dropdown/Dropdown';
 import ScalingModal from './ScalingModal/ScalingModal';
 
 const Editor = () => {
     const { image, setImage } = useContext(ImageContext);
+    
     const [pipetteActive, setPipetteActive] = useState(false);
     const [pipetteColor, setPipetteColor] = useState("");
     const [cursor, setCursor] = useState({ x: 0, y: 0 });
@@ -16,7 +17,6 @@ const Editor = () => {
     const [height, setHeight] = useState(0);
     const [fileSize, setFileSize] = useState(0);
     const [scaleFactor, setScaleFactor] = useState(0);
-    const [changedScale, setChangedScale] = useState(1);
     const [selectOption, setSelectOption] = useState(null);
 
     // Работа с модальны окном
@@ -40,7 +40,6 @@ const Editor = () => {
     const canvas = useRef();
     const context = useRef();
 
-
     useEffect(() => {
         if (!image) return;
 
@@ -49,7 +48,6 @@ const Editor = () => {
         const workspaceHeight = workspace.offsetHeight;
         const maxWidth = workspaceWidth - 100;
         const maxHeight = workspaceHeight - 100;
-
         const widthScale = maxWidth / imageObj.width;
         const heightScale = maxHeight / imageObj.height;
         const newScaleFactor = Math.min(widthScale, heightScale);
@@ -70,8 +68,6 @@ const Editor = () => {
         const newImageObj = new Image();
         newImageObj.src = image;
         newImageObj.onload = () => {
-            // setWidth(imageObj.width);
-            // setHeight(imageObj.height);
             setSelectOption(Math.round(newScaleFactor * 100));
             setFileSize(Math.floor(imageObj.src.length / 1024 * 0.77));
         };
@@ -89,6 +85,11 @@ const Editor = () => {
         pipetteActive && setPipetteColor(color);
     };
 
+    const updateImage = (image) => {
+        console.log(image);
+        setImage(image);
+    }
+
     function handleMouseMove(e) {
         const rect = canvas.current.getBoundingClientRect();
         setCursor({
@@ -103,29 +104,10 @@ const Editor = () => {
         const a = document.createElement('a');
         document.body.appendChild(a);
         a.href = url;
-        a.download = 'canvas.png';
+        a.download = 'editedImage.png';
         a.click();
         document.body.removeChild(a);
     };
-
-    const handleScaleChange = (event) => {
-        const workspace = document.querySelector('.workspace');
-        const workspaceWidth = workspace.offsetWidth;
-        const workspaceHeight = workspace.offsetHeight;
-        const maxWidth = workspaceWidth - 100;
-        const maxHeight = workspaceHeight - 100;
-        const newScaleFactor = parseFloat(event.target.value);
-        setScaleFactor(newScaleFactor);
-        const scaledWidth = imageObj.width * scaleFactor;
-        const scaledHeight = imageObj.height * scaleFactor;
-        const canvasElement = canvas.current;
-        canvasElement.width = scaledWidth;
-        canvasElement.height = scaledHeight;
-        context.current.drawImage(imageObj, (maxWidth - scaledWidth) / 2 + 50, (maxHeight - scaledHeight) / 2 + 50, scaledWidth, scaledHeight);
-
-    };
-
-
 
     return (
         <section className="editor">
@@ -177,7 +159,7 @@ const Editor = () => {
                 </div>
             }
             <Modal isOpen={isModalOpen} onClose={closeModal} title="Масштабирование изображения">
-                <ScalingModal image={imageObj} scaleFactor={scaleFactor} setImage={setImage}/>
+                <ScalingModal image={imageObj} scaleFactor={scaleFactor} setImage={updateImage} closeModal={closeModal}/>
             </Modal>
         </section>
     );

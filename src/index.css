@@ -18,6 +18,7 @@
   --dark-drophover: rgb(63, 63, 63);
   --light-gray: rgb(213, 213, 213);
   --light-bg: rgb(248, 248, 248);
+  --accent: #df6d21;
 }
 
 #root {

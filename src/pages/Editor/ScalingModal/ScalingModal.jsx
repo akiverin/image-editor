@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './ScalingModal.css';
 import PropTypes from 'prop-types';
-import Dropdown from '../../../components/Dropdown/Dropdown';
-import Input from '../../../components/Input/Input';
-import TheButton from '../../../components/Button/TheButton';
+import Dropdown from '@components/Dropdown/Dropdown';
+import Input from '@components/Input/Input';
+import TheButton from '@components/Button/TheButton';
+import nearestNeighborInterpolation from '@utils/ImageProcessing/NearestNeighborInterpolation';
 
-const ScalingModal = ({ image, scaleFactor, setImage }) => {
+const ScalingModal = ({ image, scaleFactor, setImage, closeModal }) => {
     const [resizeMode, setResizeMode] = useState('percent');
     const [width, setWidth] = useState('');
     const [height, setHeight] = useState('');
@@ -39,7 +40,6 @@ const ScalingModal = ({ image, scaleFactor, setImage }) => {
         setWidth(value);
         if (lockAspectRatio) {
             const newHeight = resizeMode === 'Проценты' ? value : (value / aspectRatio);
-            console.log(newHeight)
             setHeight(Math.round(newHeight));
             setResizedPixels(Math.round(newHeight * value * (resizeMode === 'Проценты' ? aspectRatio : 1)));
         }
@@ -62,35 +62,18 @@ const ScalingModal = ({ image, scaleFactor, setImage }) => {
         const newHeight = resizeMode === 'Проценты' ? (image.height * height) / 100 : height;
         canvas.width = newWidth;
         canvas.height = newHeight;
-    
         // Рисование исходного изображения на холсте
-        ctx.drawImage(image, 0, 0);
-    
+        ctx.drawImage(image, 0, 0, newWidth, newHeight);
         // Получение пиксельных данных исходного изображения
-        const imageData = ctx.getImageData(0, 0, image.width, image.height);
-    
+        const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
         // Применение алгоритма ближайшего соседа для интерполяции
-        if (interpolationAlgorithm) {
-            const resizedImageData = ctx.createImageData(newWidth, newHeight);
-    
-            for (let y = 0; y < newHeight; y++) {
-                for (let x = 0; x < newWidth; x++) {
-                    const srcX = Math.round((x * image.width) / newWidth);
-                    const srcY = Math.round((y * image.height) / newHeight);
-                    const srcIndex = (srcY * image.width + srcX) * 4;
-                    const dstIndex = (y * newWidth + x) * 4;
-                    resizedImageData.data[dstIndex] = imageData.data[srcIndex];
-                    resizedImageData.data[dstIndex + 1] = imageData.data[srcIndex + 1];
-                    resizedImageData.data[dstIndex + 2] = imageData.data[srcIndex + 2];
-                    resizedImageData.data[dstIndex + 3] = imageData.data[srcIndex + 3];
-                }
-            }
+        if (interpolationAlgorithm === 'Ближайший сосед') {
+            const resizedImageData = nearestNeighborInterpolation(imageData, newWidth, newHeight);
             ctx.putImageData(resizedImageData, 0, 0);
         }
-    
-        // const resizedImage = canvas.toDataURL();
-        const resizedImageData = ctx.getImageData(0, 0, newWidth, newHeight);
-        setImage(resizedImageData);
+        // Обновление изображения на холсте
+        setImage(canvas.toDataURL('image/png'));
+        closeModal();
     };
 
     const handleResizeModeChange = (selectedOption) => {
@@ -175,6 +158,7 @@ ScalingModal.propTypes = {
     image: PropTypes.object,
     scaleFactor: PropTypes.number,
     setImage: PropTypes.func,
+    closeModal: PropTypes.func,
 };
 
 export default ScalingModal;

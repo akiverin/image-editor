@@ -4,6 +4,8 @@
 
 .form__text {
     font-size: 16px;
+    padding: 0;
+    margin: 8px 0;
 }
 
 .form__label {
@@ -106,3 +108,8 @@
     stroke-miterlimit: 10;
 }
 
+@media (prefers-color-scheme: light) {
+    .scaling-modal {
+        color: black;
+    }
+}
