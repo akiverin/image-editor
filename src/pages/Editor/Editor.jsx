@@ -21,18 +21,10 @@ const Editor = () => {
 
     // Работа с модальны окном
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
 
-    // Выпадающий список
-    const onSelectScale = (ctx) => {
-        console.log(ctx/100)
-        setScaleFactor(ctx/100)
-    }
+    const onSelectScale = (ctx) => setScaleFactor(ctx / 100)
 
     const imageObj = new Image();
     imageObj.src = image;
@@ -42,38 +34,38 @@ const Editor = () => {
 
     useEffect(() => {
         if (!image) return;
-      
+
         const imageObj = new Image();
         imageObj.src = image;
         imageObj.crossOrigin = 'anonymous';
-      
+
         const workspace = document.querySelector('.workspace');
         const workspaceWidth = workspace.offsetWidth;
         const workspaceHeight = workspace.offsetHeight;
         const maxWidth = workspaceWidth - 100;
         const maxHeight = workspaceHeight - 100;
-      
+
         imageObj.onload = () => {
-          const widthScale = maxWidth / imageObj.width;
-          const heightScale = maxHeight / imageObj.height;
-          const newScaleFactor = Math.min(widthScale, heightScale);
-          scaleFactor !== 0 || setScaleFactor(newScaleFactor);
-          const scaledWidth = imageObj.width * scaleFactor;
-          const scaledHeight = imageObj.height * scaleFactor;
-      
-          const canvasElement = canvas.current;
-          context.current = canvasElement.getContext('2d');
-      
-          canvasElement.width = workspaceWidth;
-          canvasElement.height = workspaceHeight;
-          context.current.drawImage(imageObj, (maxWidth - scaledWidth) / 2 + 50, (maxHeight - scaledHeight) / 2 + 50, scaledWidth, scaledHeight);
-          setWidth(scaledWidth);
-          setHeight(scaledHeight);
-      
-          setSelectOption(Math.round(newScaleFactor * 100));
-          setFileSize(Math.floor(imageObj.src.length / 1024 * 0.77));
+            const widthScale = maxWidth / imageObj.width;
+            const heightScale = maxHeight / imageObj.height;
+            const newScaleFactor = Math.min(widthScale, heightScale);
+            scaleFactor !== 0 || setScaleFactor(newScaleFactor);
+            const scaledWidth = imageObj.width * scaleFactor;
+            const scaledHeight = imageObj.height * scaleFactor;
+
+            const canvasElement = canvas.current;
+            context.current = canvasElement.getContext('2d');
+
+            canvasElement.width = workspaceWidth;
+            canvasElement.height = workspaceHeight;
+            context.current.drawImage(imageObj, (maxWidth - scaledWidth) / 2 + 50, (maxHeight - scaledHeight) / 2 + 50, scaledWidth, scaledHeight);
+            setWidth(scaledWidth);
+            setHeight(scaledHeight);
+
+            setSelectOption(Math.round(newScaleFactor * 100));
+            setFileSize(Math.floor(imageObj.src.length / 1024 * 0.77));
         };
-      }, [image, scaleFactor]);
+    }, [image, scaleFactor, imageObj]);
 
     const handleCanvasClick = (event) => {
         const canvasRef = canvas.current;
@@ -100,14 +92,25 @@ const Editor = () => {
     }
 
     const handleDownload = () => {
-        const url = canvas.current.toDataURL();
-        console.log(url)
-        const a = document.createElement('a');
-        document.body.appendChild(a);
-        a.href = url;
-        a.download = 'editedImage.png';
-        a.click();
-        document.body.removeChild(a);
+        const canvasRef = canvas.current;
+        const context = canvasRef.getContext('2d');
+
+        const imageObj = new Image();
+        imageObj.src = image;
+        imageObj.crossOrigin = 'anonymous';
+
+        imageObj.onload = () => {
+            canvasRef.width = imageObj.width;
+            canvasRef.height = imageObj.height;
+            context.drawImage(imageObj, 0, 0);
+            const url = canvasRef.toDataURL();
+            const a = document.createElement('a');
+            document.body.appendChild(a);
+            a.href = url;
+            a.download = 'editedImage.png';
+            a.click();
+            document.body.removeChild(a);
+        };
     };
 
     return (
@@ -138,29 +141,32 @@ const Editor = () => {
             <div className="editor__workspace workspace">
                 <canvas className={pipetteActive ? "workspace__canvas workspace__canvas--pipette" : "workspace__canvas"} ref={canvas} onClick={handleCanvasClick} onMouseMove={handleMouseMove} />
             </div>
-            {image &&
-                <div className="editor__status-bar status-bar">
-                    <span>
-                        Разрешение: {Math.round(width)} x {Math.round(height)} пикселей
+            <div className="editor__status-bar status-bar">
+                {image && <>
+                    <span className="status-bar__text">
+                        Разрешение: {Math.round(width)}&nbsp;x&nbsp;{Math.round(height)}&nbsp;px
                     </span>
-                    <span>
-                        Размер файла: {fileSize} Кбайт
+                    <span className="status-bar__text">
+                        Размер файла: {fileSize}&nbsp;Кб
                     </span>
                     {pipetteActive &&
                         <>
-                            <span>
-                                Цвет: {pipetteColor}
+                            <span className="status-bar__text">
+                                Цвет:&nbsp;
                             </span>
                             <div className="status-bar__color" style={{ backgroundColor: pipetteColor }}></div>
+                            <span className="status-bar__text">
+                                {pipetteColor}
+                            </span>
                         </>
                     }
-                    <span className="coordinates">
-                        Координаты: x {cursor.x}; y {cursor.y}
+                    <span className="status-bar__text">
+                        Координаты: x&nbsp;{cursor.x}; y&nbsp;{cursor.y}
                     </span>
-                </div>
-            }
+                </>}
+            </div>
             <Modal isOpen={isModalOpen} onClose={closeModal} title="Масштабирование изображения">
-                <ScalingModal image={imageObj} scaleFactor={scaleFactor} setImage={updateImage} closeModal={closeModal}/>
+                <ScalingModal image={imageObj} setImage={updateImage} closeModal={closeModal} />
             </Modal>
         </section>
     );

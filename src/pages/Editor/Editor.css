@@ -17,6 +17,12 @@
     border-bottom: 2px solid var(--dark-bg);
     background-color: var(--dark-gray);
   }
+
+  .menu-bar__actions {
+    display: flex;
+    gap: 8px;
+    height: 26px;
+  }
   
   .editor__tool-panel {
     grid-row: 2 / 3;
@@ -84,6 +90,10 @@
 
 .menu-bar__size {
   max-width: 140px;
+}
+
+.status-bar__text {
+  line-height: 1.2;
 }
 
 @media (prefers-color-scheme: light) {

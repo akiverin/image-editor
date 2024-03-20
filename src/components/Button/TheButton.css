@@ -1,51 +1,114 @@
 .button {
-    padding: 0.5em;
+    height: 42px;
+    padding: 0 1.4em;
     line-height: 0.8;
     border-radius: 5px;
+    line-height: 1.2;
     font-size: 14px;
     /* font-size: 0.9em; */
     color: #ffffffcc;
     background-color: #11111100;
-    transition: all 200ms ease;
+    transition: all 200ms ease-in-out;
     &:focus {
         outline: 0px auto -webkit-focus-ring-color;
       }
     &:hover {
       color: white;
-      border-color: #ffffff;
     }
 }
 
+.button--normal {
+  background-color: white;
+  color: rgba(0, 0, 0, 0.9);
+  border-radius: 4px; 
+  overflow: hidden; 
+  justify-content: center; 
+  align-items: center; 
+  display: inline-flex;
+  font-weight: 600;
+  backdrop-filter: blur(5px);
+  box-shadow: 
+    0px 1px 1px 0px #FFFFFF33 inset,
+    0px 6px 12px 0px #FFFFFF1F inset,
+    0px 1px 2px 0px #08080833,
+    0px 4px 4px 0px #08080814;
+  &:hover {
+    border-color: #000;
+    background-color: white;
+    color: black
+  }
+}
+
 .button--accent {
-  border: none;
-  border-radius: 100px;
-  background-color: #f5731d;
+  background-color: #FF4D00;
   color: white;
-  padding: 12px 24px;
+  box-shadow: 
+    0px 1px 1px 0px #FFFFFF33 inset,
+    0px 6px 12px 0px #FFFFFF1F inset,
+    0px 1px 2px 0px #08080833,
+    0px 4px 4px 0px #08080814;
+  border-radius: 8px; 
+  overflow: hidden; 
+  justify-content: center; 
+  align-items: center; 
+  display: inline-flex;
   font-weight: 600;
   &:hover {
-    background-color: #df6d21;
+    background-color: #f8540e;
+  }
+}
+
+.button--adjacent_left {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  &:hover {
+    background-color: rgb(220, 220, 220);
+    border: none;
+  }
+}
+
+.button--adjacent_right {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: rgb(229, 229, 229);
+  box-shadow: 
+    0px 1px 1px 0px #FFFFFF33 inset,
+    0px 6px 12px 0px #FFFFFF1F inset,
+    0px 1px 2px 0px #08080833,
+    0px 4px 4px 0px #08080814;
+  padding: 12px;
+  &:hover {
+    background-color: rgb(220, 220, 220);
+    border: none;
   }
 }
 
 @media (prefers-color-scheme: light) {
     .button {
-      color: #213547;
-      background-color: #e4e4e400;
+      color: #000000ee;
+      border: 1.6px solid transparent;
       &:hover {
         color: rgb(0, 0, 0);
-        background-color: #e7e7e7aa;
-        border-color: #353535;
+        border: 1.6px solid black;
       }
     }
+
+    .button--normal {
+      background-color: #ffffff;
+      border: 1.6px solid transparent;
+      &:hover {
+        border: 1.6px solid transparent;
+      }
+    }
+
     .button--accent {
-      background-color: #f5731d;
+      background-color: #FF4D00;
       color: white;
-      padding: 12px 24px;
       font-weight: 600;
       &:hover {
-        background-color: #df6d21;
+        background-color: #f8540e;
         color: white;
+        border: 1.6px solid transparent;
       }
     }
   }

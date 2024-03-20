@@ -7,25 +7,28 @@ import TheButton from '@components/Button/TheButton';
 import { ImageContext } from '@/ImageProvider';
 import nearestNeighborInterpolation from '@utils/ImageProcessing/NearestNeighborInterpolation';
 
-const ScalingModal = ({ image, scaleFactor, closeModal }) => {
+const ScalingModal = ({ image, closeModal }) => {
     const { setImage } = useContext(ImageContext);
-    const [resizeMode, setResizeMode] = useState('percent');
+    const [resizeMode, setResizeMode] = useState('Пиксели');
     const [width, setWidth] = useState('');
     const [height, setHeight] = useState('');
     const [lockAspectRatio, setLockAspectRatio] = useState(true);
     const [aspectRatio, setAspectRatio] = useState(0);
-    const [interpolationAlgorithm, setInterpolationAlgorithm] = useState('nearest-neighbor');
+    const [interpolationAlgorithm, setInterpolationAlgorithm] = useState('Ближайший сосед');
     const [initialPixels, setInitialPixels] = useState(0);
     const [resizedPixels, setResizedPixels] = useState(0);
+    // Для ошибок ввода
+    const [widthError, setWidthError] = useState('');
+    const [heightError, setHeightError] = useState('');
 
     useEffect(() => {
         if (!image) return;
         setInitialPixels((image.width * image.height / 1000000).toFixed(2));
-        setResizedPixels((image.width * image.height * scaleFactor * scaleFactor / 1000000).toFixed(2));
         setHeight(image.height);
         setWidth(image.width);
+        setResizedPixels((width * height / 1000000).toFixed(2));
         setAspectRatio(image.width / image.height);
-    }, [image, scaleFactor])
+    }, [image])
 
     useEffect(()=>{
         if (resizeMode == "Проценты") {
@@ -37,31 +40,48 @@ const ScalingModal = ({ image, scaleFactor, closeModal }) => {
         }
     }, [resizeMode])
 
-    const handleWidthChange = (ctx) => {
-        const value = ctx;
+    useEffect(()=>{
+        if (!Number.isInteger(Number(height)) || Number(height) <= 0) {
+            setHeightError('⚠ Высота должна быть целым положительным числом');
+        } else {
+            setHeightError('');
+        }
+        if (!Number.isInteger(Number(width)) || Number(width) <= 0) {
+            setWidthError('⚠ Ширина должна быть целым положительным числом');
+        } else {
+            setWidthError('');
+        }
+    }, [height, width])
+
+    const handleWidthChange = (value) => {
         setWidth(value);
         if (lockAspectRatio) {
             const newHeight = resizeMode === 'Проценты' ? value : (value / aspectRatio);
             setHeight(Math.round(newHeight));
-            setResizedPixels(Math.round(newHeight * value * (resizeMode === 'Проценты' ? aspectRatio : 1)));
+            setResizedPixels(((resizeMode === 'Проценты' ? image.height * image.width * (value/100)**2: newHeight * value) / 1000000).toFixed(2));
+        } else {
+            setResizedPixels(((resizeMode === 'Проценты' ? image.height * image.width * value/100 * height/100: height * value) / 1000000).toFixed(2));
         }
     };
 
-    const handleHeightChange = (ctx) => {
-        const value = ctx;
-        setHeight(ctx);
+    const handleHeightChange = (value) => {
+        setHeight(value);
         if (lockAspectRatio) {
-            const newWidth = resizeMode === 'Проценты' ? (value / 100) * image.width : (value * aspectRatio);
+            const newWidth = resizeMode === 'Проценты' ? value : (value * aspectRatio);
             setWidth(Math.round(newWidth));
-            setResizedPixels(Math.round(newWidth * value * (resizeMode === 'Проценты' ? 1 / aspectRatio : 1)));
+            setResizedPixels(((resizeMode === 'Проценты' ? image.height * image.width * (value/100)**2 : newWidth * value) / 1000000).toFixed(2));
+        } else {
+            setResizedPixels(((resizeMode === 'Проценты' ? image.height * image.width * value/100 * width/100 : width * value) / 1000000).toFixed(2));
         }
     };
 
     const handleResizeConfirm = () => {
+        if (heightError || widthError || resizeMode=="Проценты"?(height>1000 || width>1000):(height>10000 || width>10000)) return
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        const newWidth = resizeMode === 'Проценты' ? (image.width * width) / 100 : width;
-        const newHeight = resizeMode === 'Проценты' ? (image.height * height) / 100 : height;
+        const newWidth = resizeMode === 'Проценты' ? Math.round((image.width * width) / 100) : width;
+        const newHeight = resizeMode === 'Проценты' ? Math.round((image.height * height) / 100) : height;
+        console.log(newWidth, newHeight)
         canvas.width = newWidth;
         canvas.height = newHeight;
         // Рисование исходного изображения на холсте
@@ -93,10 +113,10 @@ const ScalingModal = ({ image, scaleFactor, closeModal }) => {
     return (
         <form className="scaling-modal" onSubmit={handleSubmit}>
             <p className="form__text">
-                Изначальные размер: {initialPixels} Мп
+                Размер исходного изображения: {initialPixels} MPx
             </p>
             <p className="form__text">
-                Размер обработанного: {resizedPixels} Мп
+                Размер после изменений: {resizedPixels} MPx
             </p>
             <h3 className="form__name">Настройка размеров</h3>
             <div className="form__settings">
@@ -149,6 +169,15 @@ const ScalingModal = ({ image, scaleFactor, closeModal }) => {
                     </span>
                 </div>
             </div>
+            <div className="form__errors">
+                {widthError && <p className="form__error">{widthError}</p>}
+                {heightError && <p className="form__error">{heightError}</p>}
+                {resizeMode=="Проценты"?
+                (height>1000 || width>1000) && <p className="form__error">⚠ Ширина или высота изображения не должна превышать 1000 процентов</p>
+                :
+                (height>10000 || width>10000) && <p className="form__error">⚠ Ширина или высота изображения не должна превышать 10000 пикселей</p>
+                }
+                </div>
             <TheButton className="form__button" accent={true} onClick={handleResizeConfirm}>
                 Выполнить
             </TheButton>
