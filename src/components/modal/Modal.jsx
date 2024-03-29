@@ -13,7 +13,6 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   }, [isOpen]);
 
   return (
-    <>
       <dialog className="modal" ref={dialogRef} onCancel={onClose}>
         <div className="modal__head">
           <h2 className='modal__title'>{title}</h2>
@@ -23,7 +22,6 @@ const Modal = ({ isOpen, onClose, title, children }) => {
           {children}
         </div>
       </dialog>
-    </>
   );
 };
 

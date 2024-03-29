@@ -76,7 +76,7 @@ const ScalingModal = ({ image, closeModal }) => {
     };
 
     const handleResizeConfirm = () => {
-        if (heightError || widthError || resizeMode=="Проценты"?(height>1000 || width>1000):(height>10000 || width>10000)) return
+        if (heightError || widthError || resizeMode=="Проценты"?(height*image.height/100>10000 || image.width*width/100>10000):(height>10000 || width>10000)) return
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         const newWidth = resizeMode === 'Проценты' ? Math.round((image.width * width) / 100) : width;
@@ -95,6 +95,7 @@ const ScalingModal = ({ image, closeModal }) => {
         }
         // Обновление изображения на холсте
         setImage(canvas.toDataURL('image/png'));
+        setResizeMode("Пиксели")
         closeModal();
     };
 
@@ -173,9 +174,9 @@ const ScalingModal = ({ image, closeModal }) => {
                 {widthError && <p className="form__error">{widthError}</p>}
                 {heightError && <p className="form__error">{heightError}</p>}
                 {resizeMode=="Проценты"?
-                (height>1000 || width>1000) && <p className="form__error">⚠ Ширина или высота изображения не должна превышать 1000 процентов</p>
+                (height*image.height/100>10000 || image.width*width/100>10000) && <p className="form__error">⚠ Ширина или высота изображения не должна превышать 10000px (с учетом проценто H {height*image.height/100}px W {image.width*width/100}px)</p>
                 :
-                (height>10000 || width>10000) && <p className="form__error">⚠ Ширина или высота изображения не должна превышать 10000 пикселей</p>
+                (height>10000 || width>10000) && <p className="form__error">⚠ Ширина или высота изображения не должна превышать 10000px</p>
                 }
                 </div>
             <TheButton className="form__button" accent={true} onClick={handleResizeConfirm}>
