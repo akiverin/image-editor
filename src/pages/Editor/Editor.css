@@ -105,7 +105,15 @@
 }
 
 .menu-bar__size {
-  max-width: 140px;
+  max-width: 240px;
+  display: flex;
+  align-items: center;
+  gap: 10px
+}
+
+.menu-bar__desc {
+  font-size: 10px;
+  line-height: 1.2;
 }
 
 .status-bar__text {
@@ -140,7 +148,7 @@
 .status-bar__color {
   width: 20px;
   height: 20px;
-  border-radius: 2px;
+  border-radius: 20px;
   filter: drop-shadow(rgba(0, 0, 0, 0.3) 0px 1px 1px);
 }
 .coordinates {
@@ -149,4 +157,11 @@
   position: fixed;
   right: 4px;
   bottom: 4px;
+}
+
+.editor__all-colors {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: min(240px, 40vw);
 }

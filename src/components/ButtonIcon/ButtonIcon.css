@@ -1,4 +1,5 @@
 .button-icon {
+    position: relative;
     display: flex;
     align-items: center;
     padding: 0.5em;
@@ -27,6 +28,31 @@
 .button-icon--active {
   border: 1px solid #adadad;
   background-color: #111111;
+}
+
+.tooltip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px); /* Располагаем подсказку справа от кнопки */
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 10px;
+  display: none;
+  max-width: 300px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  z-index: 999;
+  opacity: 0;
+  transition: all 0.5s ease-in-out;
+}
+
+.button-icon:hover .tooltip {
+  opacity: 1;
+  transition: all 0.2s ease-in-out;
+  display: block;
 }
 
 @media (prefers-color-scheme: light) {

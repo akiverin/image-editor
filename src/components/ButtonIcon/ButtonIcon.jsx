@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import './ButtonIcon.css';
 
-const ButtonIcon = ({ title, children, onClick, active, link }) => {
+const ButtonIcon = ({ title, children, onClick, active, link, tooltip }) => {
+
   return (
     !link ? 
     <button 
@@ -11,6 +12,7 @@ const ButtonIcon = ({ title, children, onClick, active, link }) => {
       onClick={onClick}
     >
         {title&&<span className="visually-hidden">{title}</span>}
+        {tooltip && <p className="tooltip">{tooltip}</p>}
         {children}
     </button> :
     <Link 
@@ -30,6 +32,7 @@ ButtonIcon.propTypes = {
   onClick: PropTypes.func,
   active: PropTypes.bool,
   link: PropTypes.string,
+  tooltip: PropTypes.string,
 };
 
 export default ButtonIcon;
