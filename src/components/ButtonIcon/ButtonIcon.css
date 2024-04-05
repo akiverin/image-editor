@@ -30,7 +30,7 @@
   background-color: #111111;
 }
 
-.tooltip {
+.button-icon__tooltip {
   position: absolute;
   top: 50%;
   left: calc(100% + 10px); /* Располагаем подсказку справа от кнопки */
@@ -49,7 +49,33 @@
   transition: all 0.5s ease-in-out;
 }
 
-.button-icon:hover .tooltip {
+.button-icon__tooltip {
+	cursor: help;
+}
+
+.button-icon__tooltip::after{
+    z-index: 5;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 8px 8px 8px 0px;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
+    color: #FFF;
+    content: attr(data-tooltip);
+    margin-top: -24px;
+    font-size: 10px;
+    opacity: 0;
+    max-width: min(80%, 400px);
+    padding: 3px 7px;
+    position: fixed;
+    visibility: hidden;
+    transition: all 0.4s ease-in-out;
+}
+
+.button-icon__tooltip:hover::after {
+	opacity: 1;
+	visibility: visible;
+}
+
+.button-icon:hover .button-icon__tooltip {
   opacity: 1;
   transition: all 0.2s ease-in-out;
   display: block;

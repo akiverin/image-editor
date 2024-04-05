@@ -54,15 +54,20 @@ export function rgbToLab(rgb) {
 
     return `${Math.round(L * 100) / 100}% ${Math.round(a * 100) / 100}% ${Math.round(b * 100) / 100}%`;}
 
-export function calculateContrast(color1, color2) {
-    const rgb1 = color1;
-    const rgb2 = color2;
-    const L1 = calculateLuminance(rgb1);
-    const L2 = calculateLuminance(rgb2);
-    const contrast = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
-    return contrast;
-}
-
-export function calculateLuminance(rgb) {
-    return (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
-}
+    export function calculateContrast(color1, color2) {
+        const rgb1 = color1.map(channel => channel / 255);
+        const rgb2 = color2.map(channel => channel / 255);
+        const L1 = calculateLuminance(rgb1);
+        const L2 = calculateLuminance(rgb2);
+        const contrast = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+        return contrast >= 4.5 ? `${contrast.toFixed(2)}:1` : `${contrast.toFixed(2)}:1 (недостаточный)`;
+    }
+    
+    export function calculateLuminance(rgb) {
+        const [R, G, B] = rgb.map(channel => {
+            channel = channel <= 0.03928 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4);
+            return channel;
+        });
+    
+        return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+    }

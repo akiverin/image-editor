@@ -26,6 +26,9 @@ const Editor = () => {
     const [infoActive, setInfoActive] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [canvasTranslation, setCanvasTranslation] = useState({ x: 0, y: 0 });
+    const [imageCoordinatesBase, setImageCoordinatesBase] = useState({ x: 0, y: 0 });
+    const [imageCoordinatesExtra, setImageCoordinatesExtra] = useState({ x: 0, y: 0 });
+
 
     // Работа с модальны окном
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -121,6 +124,9 @@ const Editor = () => {
         tempCanvas.willReadFrequently = true;
         const tempContext = tempCanvas.getContext('2d');
         tempContext.drawImage(canvasRef, 0, 0);
+
+        const paddingW = document.querySelector('.workspace').offsetWidth-width;
+        const paddingH = document.querySelector('.workspace').offsetHeight-height;
     
         const pixelData = tempContext.getImageData(x, y, 1, 1).data;
         const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
@@ -128,8 +134,11 @@ const Editor = () => {
         if (toolActive === "pipette") {
             if (event.altKey) {
                 setPipetteColor2(color);
+                setImageCoordinatesExtra({x: x - paddingW/2 - canvasTranslation.x, y: y - paddingH/2 - canvasTranslation.y})
             } else {
                 setPipetteColor1(color);
+                setImageCoordinatesBase({x: x - paddingW/2 - canvasTranslation.x, y: y - paddingH/2 - canvasTranslation.y})
+
             }
         }
     };
@@ -165,7 +174,7 @@ const Editor = () => {
         if (isDragging && toolActive === "hand") {
             const dx = e.clientX - rect.left - cursor.x;
             const dy = e.clientY - rect.top - cursor.y;
-            updateTranslation(animationFrameId, canvasTranslation, setCanvasTranslation, dx, dy);
+            updateTranslation(animationFrameId, canvasTranslation, setCanvasTranslation, dx, dy, width, height, scaleFactor);
         }
     }
     const handleKeyDownEvent = (e) => handleKeyDown(toolActive, canvasTranslation, setCanvasTranslation, e);
@@ -257,37 +266,79 @@ const Editor = () => {
             </div>
             <ContextModal isOpen={isContextModalOpen||toolActive==="pipette"} onClose={closeContextModal} title="Информация">
                 <div className="editor__all-colors">
+                <div className="editor__info-color">
+                        <p className="status-bar__text">
+                            &nbsp;
+                        </p>
+                        <div className="status-bar__color"></div>
+                        <p className="status-bar__text">
+                            <span
+                                className="tooltip"
+                                data-tooltip="RGB (красный, зелёный, синий) представляет собой аддитивную цветовую модель, где каждый пиксель определяется комбинацией красного, зелёного и синего цветов. Оси представляют отдельные каналы: красный (R), зелёный (G) и синий (B), каждый из которых имеет диапазон значений от 0 до 255."
+                            >
+                                &#9432; 
+                            </span>
+                            <span> RGB</span>
+                        </p>
+                        <p className="status-bar__text">
+                            <span
+                                className="tooltip"
+                                data-tooltip="XYZ является абсолютной моделью цвета и используется для описания цвета независимо от устройства. Оси этого пространства представляют три компоненты: X, Y и Z, которые характеризуют цвет в терминах его яркости, а также красной и зелёной составляющих. Диапазон значений зависит от конкретной реализации, обычно X и Y находятся в диапазоне от 0 до 1, а Z — от 0 до 1."
+                            >
+                                &#9432; 
+                            </span>
+                            <span> XYZ</span>
+                        </p>
+                        <p className="status-bar__text">
+                            <span
+                                className="tooltip"
+                                data-tooltip=" Lab представляет собой цветовую модель, основанную на восприятии цвета человеческим глазом. Оси этого пространства включают L (яркость), a (цвет от зелёного до красного) и b (цвет от синего до жёлтого). Значения L находятся в диапазоне от 0 до 100, а значения a и b — от -128 до 127."
+                            >
+                                &#9432; 
+                            </span>
+                            <span> Lab</span>
+                        </p>
+                        <p className="status-bar__text">
+                            xy
+                        </p>
+                    </div>
                     <div className="editor__info-color">
-                        <span className="status-bar__text">
+                        <p className="status-bar__text">
                             Цвет #1:&nbsp;
-                        </span>
+                        </p>
                         <div className="status-bar__color" style={{ backgroundColor: pipetteColor1 }}></div>
                         <p className="status-bar__text">
                             &nbsp;{pipetteColor1}
                         </p>
                         <p className="status-bar__text">
-                            &nbsp;{pipetteColor1 && "XYZ " + rgbToXyz(extractRGB(pipetteColor1))}
+                            &nbsp;{pipetteColor1 &&  rgbToXyz(extractRGB(pipetteColor1))}
                         </p>
                         <p className="status-bar__text">
-                            &nbsp;{pipetteColor1 && "Lab " + rgbToLab(extractRGB(pipetteColor1))}
+                            &nbsp;{pipetteColor1 && rgbToLab(extractRGB(pipetteColor1))}
+                        </p>
+                        <p className="status-bar__text">
+                            &nbsp;({imageCoordinatesBase.x.toFixed(0)}, {imageCoordinatesBase.y.toFixed(0)})
                         </p>
                     </div>
                     <div className="editor__info-color">
-                        <span className="status-bar__text">
+                        <p className="status-bar__text">
                             Цвет #2 (alt или option):&nbsp;
-                        </span>
+                        </p>
                         <div className="status-bar__color" style={{ backgroundColor: pipetteColor2 }}></div>
                         <p className="status-bar__text">
                             &nbsp;{pipetteColor2}
                         </p>
                         <p className="status-bar__text">
-                            &nbsp;{pipetteColor2 && "XYZ " + rgbToXyz(extractRGB(pipetteColor2))}
+                            &nbsp;{pipetteColor2 && rgbToXyz(extractRGB(pipetteColor2))}
                         </p>
                         <p className="status-bar__text">
-                            &nbsp;{pipetteColor2 && "Lab " + rgbToLab(extractRGB(pipetteColor2))}
+                            &nbsp;{pipetteColor2 && rgbToLab(extractRGB(pipetteColor2))}
+                        </p>
+                        <p className="status-bar__text">
+                            &nbsp;({imageCoordinatesExtra.x.toFixed(0)}, {imageCoordinatesExtra.y.toFixed(0)})
                         </p>
                     </div>
-                    <p>{(pipetteColor1 && pipetteColor2) && calculateContrast(extractRGB(pipetteColor1),extractRGB(pipetteColor2))}</p>
+                    <p className="editor__contrast-info">Контраст {(pipetteColor1 && pipetteColor2) && calculateContrast(extractRGB(pipetteColor1),extractRGB(pipetteColor2))}</p>
                 </div>
             </ContextModal>
             <div className={"editor__workspace workspace" + (toolActive==="hand"?" workspace--hand":"")}>

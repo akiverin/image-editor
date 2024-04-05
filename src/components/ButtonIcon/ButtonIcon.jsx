@@ -12,7 +12,7 @@ const ButtonIcon = ({ title, children, onClick, active, link, tooltip }) => {
       onClick={onClick}
     >
         {title&&<span className="visually-hidden">{title}</span>}
-        {tooltip && <p className="tooltip">{tooltip}</p>}
+        {tooltip && <p className="button-icon__tooltip">{tooltip}</p>}
         {children}
     </button> :
     <Link 

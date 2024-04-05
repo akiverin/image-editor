@@ -160,8 +160,18 @@
 }
 
 .editor__all-colors {
+  display: grid;
+  grid-template-columns: 60px 1fr 1fr;
+  gap: 4px;
+  width: min(480px, 40vw);
+}
+
+.editor__info-color {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  width: min(240px, 40vw);
+  gap: 6px;
+}
+
+.editor__contrast-info {
+  grid-column: 1 / span 3;
 }
