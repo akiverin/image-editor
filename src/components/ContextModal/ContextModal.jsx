@@ -30,6 +30,7 @@ ContextModal.propTypes = {
   children: PropTypes.node,
   title: PropTypes.string,
   onClose: PropTypes.func,
+  className: PropTypes.string,
 };
 
 export default ContextModal;

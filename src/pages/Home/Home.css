@@ -26,3 +26,13 @@
 .home__load-buttons {
     display: flex;
 }
+
+.about {
+    display: flex;
+    flex-direction: column;
+}
+
+.about__field {
+    display: flex;
+    gap: 6px;
+}

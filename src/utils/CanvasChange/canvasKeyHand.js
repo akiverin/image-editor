@@ -7,7 +7,7 @@ export const updateTranslation = (animationFrameId, canvasTranslation, setCanvas
     const widthScale = wsWidth / width;
     const heightScale = wsHeight / height;
     
-    console.log(dx, dy, width, height, widthScale*scaleFactor, heightScale*scaleFactor)
+    console.log(dx, dy, width, height, widthScale*scaleFactor, heightScale)
     let newX = canvasTranslation.x + dx;
     let newY = canvasTranslation.y + dy;
     if (width * -1 > newX) {
@@ -40,10 +40,8 @@ export const handleMouseUp = (setIsDragging) => {
     setIsDragging(false);
 };
 
-export const handleKeyDown = (toolActive, canvasTranslation, setCanvasTranslation, e) => {
+export const handleKeyDown = (step, toolActive, canvasTranslation, setCanvasTranslation, e) => {
     if (toolActive === "hand") {
-        const step = 10; // Скорость перемещения
-
         switch (e.key) {
             case "ArrowLeft":
                 setCanvasTranslation({

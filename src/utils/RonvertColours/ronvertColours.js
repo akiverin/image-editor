@@ -52,7 +52,7 @@ export function rgbToLab(rgb) {
     const a = 500 * (fx - fy);
     const b = 200 * (fy - fz);
 
-    return `${Math.round(L * 100) / 100}% ${Math.round(a * 100) / 100}% ${Math.round(b * 100) / 100}%`;}
+    return `${Math.round(L * 100) / 100} ${Math.round(a * 100) / 100} ${Math.round(b * 100) / 100}`;}
 
     export function calculateContrast(color1, color2) {
         const rgb1 = color1.map(channel => channel / 255);

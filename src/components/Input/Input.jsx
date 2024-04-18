@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './Input.css';
 
-const Input = ({ type, placeholder, onChange, id, value, min, max, step }) => {
+const Input = ({ type, placeholder, onChange, id, value, min, max, step, w100 }) => {
     const [content, setContent] = useState(value || '');
 
     useEffect(() => {
@@ -12,14 +12,14 @@ const Input = ({ type, placeholder, onChange, id, value, min, max, step }) => {
     const handleChange = (event) => {
         const newValue = event.target.value;
         setContent(newValue);
-        onChange(newValue);
+        type=="number" ? onChange(Number(newValue)) : onChange(newValue);
     };
 
     return (
         <input
             id={id}
             type={type}
-            className="input"
+            className={w100?"input input--full":"input"} 
             onChange={handleChange}
             placeholder={placeholder}
             value={content}
@@ -42,6 +42,7 @@ Input.propTypes = {
     step: PropTypes.number,
     onChange: PropTypes.func,
     id: PropTypes.string,
+    w100: PropTypes.bool,
 };
 
 export default Input;

@@ -104,8 +104,20 @@
   cursor: crosshair;
 }
 
+.menu-bar__regulators {
+  display: inline-flex;
+  gap: 10px;
+}
+
 .menu-bar__size {
   max-width: 240px;
+  display: flex;
+  align-items: center;
+  gap: 10px
+}
+
+.menu-bar__speed {
+  max-width: 160px;
   display: flex;
   align-items: center;
   gap: 10px

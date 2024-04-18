@@ -82,8 +82,12 @@ const Home = () => {
                     }}>Перейти в редактор</TheButton>
                 </div>
             }
-            <Modal isOpen={isModalOpen} onClose={closeModal} title="Об авторе">
-                <p>Работа выполнена Кивериным А.А.</p>
+            <Modal className="about" isOpen={isModalOpen} onClose={closeModal} title="Об авторе">
+                <p className="about__text">Работа выполнена Кивериным А.А.</p>
+                <div className="about__field">
+                    <p className="about__text">Репозиторий</p>
+                    <a className="about__link" href="https://github.com/akiverin/image-editor">GitHub</a>
+                </div>
             </Modal>
         </section>
     )

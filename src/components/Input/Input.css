@@ -15,6 +15,9 @@
         border-color: rgb(67, 67, 67);
     }
 }
+.input--full {
+    width: 100%;
+}
 
 .input__error {
     position: absolute;

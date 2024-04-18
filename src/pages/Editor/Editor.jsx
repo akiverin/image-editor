@@ -3,7 +3,8 @@ import { ImageContext } from '@/ImageProvider';
 import './Editor.css';
 
 import ButtonIcon from '@components/ButtonIcon/ButtonIcon'
-import Modal from '@components/modal/Modal';
+import Modal from '@components/Modal/Modal';
+import Input from '@components/Input/Input';
 import Dropdown from '@components/Dropdown/Dropdown';
 import ScalingModal from './ScalingModal/ScalingModal';
 import ContextModal from '@components/ContextModal/ContextModal';
@@ -28,6 +29,8 @@ const Editor = () => {
     const [canvasTranslation, setCanvasTranslation] = useState({ x: 0, y: 0 });
     const [imageCoordinatesBase, setImageCoordinatesBase] = useState({ x: 0, y: 0 });
     const [imageCoordinatesExtra, setImageCoordinatesExtra] = useState({ x: 0, y: 0 });
+    const [handStep, setHandStep] = useState(10);
+
 
 
     // Работа с модальны окном
@@ -152,7 +155,7 @@ const Editor = () => {
     // Рука
 
     useEffect(() => {
-        const handleKeyDownEvent = (e) => handleKeyDown(toolActive, canvasTranslation, setCanvasTranslation, e);
+        const handleKeyDownEvent = (e) => handleKeyDown(handStep, toolActive, canvasTranslation, setCanvasTranslation, e);
         document.body.addEventListener("keydown", handleKeyDownEvent);
         return () => {
             document.body.removeEventListener("keydown", handleKeyDownEvent);
@@ -177,7 +180,7 @@ const Editor = () => {
             updateTranslation(animationFrameId, canvasTranslation, setCanvasTranslation, dx, dy, width, height, scaleFactor);
         }
     }
-    const handleKeyDownEvent = (e) => handleKeyDown(toolActive, canvasTranslation, setCanvasTranslation, e);
+    const handleKeyDownEvent = (e) => handleKeyDown(handStep, toolActive, canvasTranslation, setCanvasTranslation, e);
     const handleKeyUpEvent = (e) => handleKeyUp(toolActive, canvasTranslation, setCanvasTranslation, e);
     const handleMouseUpEvent = () => handleMouseUp(setIsDragging);
     const handleMouseDownEvent = () => handleMouseDown(toolActive, setIsDragging);
@@ -243,9 +246,15 @@ const Editor = () => {
                         Масштабировать
                     </ButtonIcon>
                 </div>
-                <div className="menu-bar__size">
-                    <p className="menu-bar__desc">Масштабирование изображения в %</p>
-                    {selectOption && <Dropdown selectOption={selectOption} options={Array.from({ length: 289 }, (_, i) => i + 12)} onSelect={onSelectScale} />}
+                <div className="menu-bar__regulators">
+                    <div className="menu-bar__speed">
+                        <p className="menu-bar__desc">Скорость перемещения</p>
+                        <Input w100 type="number" value={handStep} onChange={setHandStep} placeholder="Скорость перемещения стрелками" />
+                    </div>
+                    <div className="menu-bar__size">
+                        <p className="menu-bar__desc">Масштабирование изображения в %</p>
+                        {selectOption && <Dropdown selectOption={selectOption} options={Array.from({ length: 289 }, (_, i) => i + 12)} onSelect={onSelectScale} />}
+                    </div>
                 </div>
             </div>
             <div className="editor__tool-panel tool-panel">
