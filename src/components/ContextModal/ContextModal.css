@@ -1,88 +1,107 @@
 .context-modal {
-    background-color: var(--dark-gray);
-    border: none;
-    border-left: 1px solid black;
-    padding: 0;
-    animation: scaleIn 0.4s ease;
-    margin: 38px 48px 0 auto;
-    position: absolute;
+  background-color: var(--dark-gray);
+  border: none;
+  border-left: 1px solid var(--dark-gray);
+  padding: 0;
+  animation: translateIn 0.6s forwards;
+  margin: 38px 48px 0 auto;
+  position: fixed;
+}
+
+.context-modal__head {
+  background-color: #262626;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 14px;
+}
+
+.context-modal__body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+}
+
+.context-modal__title {
+  color: white;
+  font-weight: 500;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.context-modal__close {
+  background-color: #262626;
+  display: flex;
+  height: 30px;
+  width: 30px;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  float: right;
+  font-size: 12px;
+  line-height: 12px;
+  font-weight: 800;
+  border: 1px solid transparent;
+}
+
+.context-modal__close:focus {
+  outline: 1.5px;
+}
+
+.context-modal__close:hover {
+  border: 1px solid rgb(136, 136, 136);
+}
+
+.close:hover,
+.close:focus {
+  color: rgb(136, 136, 136);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes translateIn {
+  from {
+    transform: translateX(400px);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .context-modal {
+    background-color: white;
+    border-left: 1px solid var(--light-gray);
   }
 
   .context-modal__head {
-    background-color: #262626;
-    display: flex;
-    gap: 8px;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 14px;
+    background-color: rgb(248, 248, 248);
   }
-  .context-modal__body {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 14px;
+
+  .context-modal__close {
+    background-color: var(--light-gray);
+    color: var(--dark-drop);
   }
 
   .context-modal__title {
-    color: white;
-    font-weight: 500;
-    font-size: 16px;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .context-modal__close {
-    background-color: #262626;
-    display: flex;
-    height: 30px;
-    width: 30px;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    float: right;
-    font-size: 12px;
-    line-height: 12px;
-    font-weight: 800;
-    border: 1px solid transparent;
-  }
-  .context-modal__close:focus {
-    outline: 1.5px;
-  }
-  .context-modal__close:hover {
-    border: 1px solid rgb(136, 136, 136);
-  }
-  
-  .close:hover, .close:focus {
-    color: rgb(136, 136, 136);
-    text-decoration: none;
-    cursor: pointer;
+    color: var(--dark-drop);
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  button {
+    background-color: #f9f9f9;
   }
-  
-  @keyframes scaleIn {
-    from { transform: scale(0.7); }
-    to { transform: scale(1); }
-  }
-  
-  @media (prefers-color-scheme: light) {
-    .context-modal {
-      background-color: white;
-    }
-    .context-modal__head {
-      background-color: rgb(248, 248, 248);
-    }
-    .context-modal__close {
-      background-color: var(--light-gray);
-      color: var(--dark-drop);
-    }
-    .context-modal__title {
-      color: var(--dark-drop);
-    }
-    button {
-      background-color: #f9f9f9;
-    }
-  }
+}

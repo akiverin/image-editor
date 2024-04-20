@@ -115,7 +115,7 @@ const Editor = () => {
                 canvasElement.removeEventListener('wheel', handleWheel);
             };
         };
-    }, [image, scaleFactor, canvasTranslation.x, canvasTranslation.y, imageObj]);
+    }, [image, scaleFactor, canvasTranslation.x, canvasTranslation.y]);
 
     const handleCanvasClick = (event) => {
         const canvasRef = canvas.current;
@@ -245,6 +245,9 @@ const Editor = () => {
                     <ButtonIcon title="Масштабирование" onClick={openModal}>
                         Масштабировать
                     </ButtonIcon>
+                    <ButtonIcon title="Кривые" onClick={openModal}>
+                        Кривые
+                    </ButtonIcon>
                 </div>
                 <div className="menu-bar__regulators">
                     <div className="menu-bar__speed">
@@ -275,7 +278,7 @@ const Editor = () => {
             </div>
             <ContextModal isOpen={isContextModalOpen||toolActive==="pipette"} onClose={closeContextModal} title="Информация">
                 <div className="editor__all-colors">
-                <div className="editor__info-color">
+                    <div className="editor__info-color">
                         <p className="status-bar__text">
                             &nbsp;
                         </p>
