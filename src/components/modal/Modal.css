@@ -5,7 +5,11 @@
     padding: 0;
     width: min(64%, 420px, calc(100% - 20px));
     animation: scaleIn 0.4s ease;
-    margin: 15% auto;
+  }
+
+  .modal--w80 {
+    width: min(80%, 640px, calc(100% - 20px));
+
   }
 
   .modal__head {

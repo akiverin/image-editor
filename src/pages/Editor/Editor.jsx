@@ -11,6 +11,7 @@ import ContextModal from '@components/ContextModal/ContextModal';
 
 import { updateTranslation, handleKeyDown, handleKeyUp, handleMouseUp, handleMouseDown } from '@utils/CanvasChange/canvasKeyHand';
 import {extractRGB, rgbToXyz, rgbToLab, calculateContrast} from '@utils/RonvertColours/ronvertColours'
+import CurvesModal from './CurvesModal/CurvesModal';
 
 const Editor = () => {
     const { image, setImage } = useContext(ImageContext);
@@ -35,11 +36,19 @@ const Editor = () => {
 
     // Работа с модальны окном
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalCurvesOpen, setIsModalCurvesOpen] = useState(false);
     const openModal = () => {
         setIsModalOpen(true);
         setToolActive("cursor");
     }
-    const closeModal = () => setIsModalOpen(false);
+    const openCurvesModal = () => {
+        setIsModalCurvesOpen(true);
+        setToolActive("cursor");
+    }
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setIsModalCurvesOpen(false);
+    }
     const [isContextModalOpen, setIsContextModalOpen] = useState(false);
     const openContextModal = () => {
         setIsContextModalOpen(true);
@@ -239,16 +248,21 @@ const Editor = () => {
                     <ButtonIcon link="/">
                         Главная
                     </ButtonIcon>
+                    {image &&
+                    <>
                     <ButtonIcon title="Скачать" onClick={handleDownload}>
                         Скачать
                     </ButtonIcon>
                     <ButtonIcon title="Масштабирование" onClick={openModal}>
                         Масштабировать
                     </ButtonIcon>
-                    <ButtonIcon title="Кривые" onClick={openModal}>
+                    <ButtonIcon title="Кривые" onClick={openCurvesModal}>
                         Кривые
                     </ButtonIcon>
+                    </>
+                    }
                 </div>
+                {image &&
                 <div className="menu-bar__regulators">
                     <div className="menu-bar__speed">
                         <p className="menu-bar__desc">Скорость перемещения</p>
@@ -259,6 +273,7 @@ const Editor = () => {
                         {selectOption && <Dropdown selectOption={selectOption} options={Array.from({ length: 289 }, (_, i) => i + 12)} onSelect={onSelectScale} />}
                     </div>
                 </div>
+                }
             </div>
             <div className="editor__tool-panel tool-panel">
                 <ButtonIcon title="Курсор" onClick={() => { setToolActive("cursor") }} active={toolActive==="cursor"} tooltip="Обычный указатель для работы с объектами и сброса других инструментов.">
@@ -383,6 +398,9 @@ const Editor = () => {
             </div>
             <Modal isOpen={isModalOpen} onClose={closeModal} title="Масштабирование изображения">
                 <ScalingModal image={imageObj} setImage={updateImage} closeModal={closeModal} />
+            </Modal>
+            <Modal w80 isOpen={isModalCurvesOpen} onClose={closeModal} title="Кривые изображения">
+                {isModalCurvesOpen && <CurvesModal imageCtx={context} setImage={updateImage} closeModal={closeModal} />}
             </Modal>
         </section>
     );

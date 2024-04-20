@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import './Modal.css';
 
-const Modal = ({ isOpen, onClose, title, children, className }) => {
+const Modal = ({ isOpen, onClose, title, children, className, w80 }) => {
   const dialogRef = useRef(null);
   useEffect(() => {
     if (isOpen) {
@@ -13,7 +13,7 @@ const Modal = ({ isOpen, onClose, title, children, className }) => {
   }, [isOpen]);
 
   return (
-      <dialog className="modal" ref={dialogRef} onCancel={onClose}>
+      <dialog className={w80?"modal modal--w80":"modal"} ref={dialogRef} onCancel={onClose}>
         <div className="modal__head">
           <h2 className='modal__title'>{title}</h2>
           <button className="modal__close" onClick={onClose}>&#x2715;</button>
@@ -31,6 +31,7 @@ Modal.propTypes = {
   title: PropTypes.string,
   onClose: PropTypes.func,
   className: PropTypes.string,
+  w80: PropTypes.bool,
 };
 
 export default Modal;
