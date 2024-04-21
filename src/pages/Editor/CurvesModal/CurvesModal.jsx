@@ -13,6 +13,9 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
     const [outA, setOutA] = useState(0);
     const [inB, setInB] = useState(255);
     const [outB, setOutB] = useState(255);
+    const [arrR, setArrR] = useState([]);
+    const [arrG, setArrG] = useState([]);
+    const [arrB, setArrB] = useState([]);
     const preview = useRef(null);
 
     useEffect(() => {
@@ -36,20 +39,36 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
             tempArrB[data[i + 2]]++;
         }
 
-        console.log(tempArrR, tempArrG, tempArrB)
+        setArrR(tempArrR);
+        setArrG(tempArrG);
+        setArrB(tempArrB);
 
-        const combinedArray = [...tempArrR, ...tempArrG, ...tempArrB];
-        const maxV = Math.max(...combinedArray);
-        console.log(maxV)
+        // console.log(tempArrR, tempArrG, tempArrB)
 
-        for (let i = 0; i < 256; i ++) {
-            tempArrR[i] = tempArrR[i] / maxV * 255;
-            tempArrG[i] = tempArrG[i] / maxV * 255;
-            tempArrB[i] = tempArrB[i] / maxV * 255;
-        }
+        // const combinedArray = [...tempArrR, ...tempArrG, ...tempArrB];
+        // const maxV = Math.max(...combinedArray);
+        // console.log(maxV)
+
+        // for (let i = 0; i < 256; i ++) {
+        //     tempArrR[i] = tempArrR[i] / maxV * 255;
+        //     tempArrG[i] = tempArrG[i] / maxV * 255;
+        //     tempArrB[i] = tempArrB[i] / maxV * 255;
+        // }
     
+        // buildHistogram(tempArrR, tempArrG, tempArrB);
+    }, [imageCtx]);
+
+    useEffect(() => {
+        if (arrR.length === 0 || arrG.length === 0 || arrB.length === 0) return;
+
+        const combinedArray = [...arrR, ...arrG, ...arrB];
+        const maxV = Math.max(...combinedArray);
+        const tempArrR = arrR.map(val => val / maxV * 255);
+        const tempArrG = arrG.map(val => val / maxV * 255);
+        const tempArrB = arrB.map(val => val / maxV * 255);
+        
         buildHistogram(tempArrR, tempArrG, tempArrB);
-    }, []);
+    }, [inA, outA, inB, outB, imageCtx, arrR, arrG, arrB]);
     
     const buildHistogram = (dataR, dataG, dataB) => {
         const margin = { top: 20, right: 20, bottom: 50, left: 50 };
@@ -116,6 +135,42 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         svg.append("g")
             .attr("class", "y axis")
             .call(d3.axisLeft(y).tickValues(d3.range(0, 256, 15))); // Добавляем деления по оси Y
+
+        svg.selectAll(".point")
+            .data([{x: inA, y: outA}, {x: inB, y: outB}])
+            .enter().append("circle")
+            .attr("class", "point")
+            .attr("cx", d => x(d.x))
+            .attr("cy", d => y(d.y))
+            .attr("r", 5)
+            .style("fill", "currentColor");
+        
+        svg.append("line")
+            .attr("class", "line")
+            .attr("x1", x(inA))
+            .attr("y1", y(outA))
+            .attr("x2", x(inB))
+            .attr("y2", y(outB))
+            .style("stroke", "currentColor")
+            .style("stroke-width", 1.2);
+
+        svg.append("line")
+            .attr("class", "line")
+            .attr("x1", x(0))
+            .attr("y1", y(outA))
+            .attr("x2", x(inA))
+            .attr("y2", y(outA))
+            .style("stroke", "currentColor")
+            .style("stroke-width", 1.2);
+        
+        svg.append("line")
+            .attr("class", "line")
+            .attr("x1", x(255))
+            .attr("y1", y(outB))
+            .attr("x2", x(inB))
+            .attr("y2", y(outB))
+            .style("stroke", "currentColor")
+            .style("stroke-width", 1.2);
     
         svg.append("text")
             .attr("transform", "rotate(-90)")
@@ -153,6 +208,13 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         console.log('Выполнить')
     }
 
+    const handleCurvesReset = () => {
+        setInA(0);
+        setOutA(0);
+        setInB(255);
+        setOutB(255);
+    }
+
 
     return (
         <form className="curves-modal form" onSubmit={handleSubmit}>
@@ -168,9 +230,15 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
                 <Input type="number" max={255} min={0} value={outB} onChange={setOutB} />
             </div>
             <canvas ref={preview} className="curves-modal__preview"></canvas>
-            <TheButton className="form__button" accent={true} onClick={handleCurvesConfirm}>
-                Выполнить
-            </TheButton>
+            <div className="curves-modal__actions">
+                <TheButton className="curves-modal__button" normal shadow onClick={handleCurvesReset}>
+                    Сбросить
+                </TheButton>
+                <TheButton className="curves-modal__button" accent={true} onClick={handleCurvesConfirm}>
+                    Выполнить
+                </TheButton>
+            </div>
+            
         </form>
     );
 };

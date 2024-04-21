@@ -21,3 +21,11 @@
 .curves-modal__name--a {
     grid-column-start: 2;
 }
+
+
+
+.curves-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
