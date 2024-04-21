@@ -1,13 +1,18 @@
-import React, { useEffect, useContext, useRef } from 'react';
+import React, { useEffect, useContext, useRef, useState } from 'react';
 import './CurvesModal.css';
 import PropTypes from 'prop-types';
 import TheButton from '@components/Button/TheButton';
 import { ImageContext } from '@/ImageProvider';
 import * as d3 from "d3";
+import Input from '@components/Input/Input';
 
 
 const CurvesModal = ({ imageCtx, closeModal }) => {
     const { image, setImage } = useContext(ImageContext);
+    const [inA, setInA] = useState(0);
+    const [outA, setOutA] = useState(0);
+    const [inB, setInB] = useState(255);
+    const [outB, setOutB] = useState(255);
     const preview = useRef(null);
 
     useEffect(() => {
@@ -20,10 +25,7 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         canvasRef.width = imageObj.width;
         canvasRef.height = imageObj.height;
         ctx.drawImage(imageObj, 0, 0);
-        console.log('wh', imageObj.width, imageObj.height)
-
         const data = ctx.getImageData(0, 0, imageObj.width, imageObj.height).data;
-    
         const tempArrR = new Array(256).fill(255);
         const tempArrG = new Array(256).fill(255);
         const tempArrB = new Array(256).fill(255);
@@ -47,7 +49,7 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         }
     
         buildHistogram(tempArrR, tempArrG, tempArrB);
-    }, [imageCtx]);
+    }, []);
     
     const buildHistogram = (dataR, dataG, dataB) => {
         const margin = { top: 20, right: 20, bottom: 50, left: 50 };
@@ -109,11 +111,11 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x).ticks(17).tickFormat(d3.format("d"))); // Добавляем деления по оси X
+            .call(d3.axisBottom(x).tickValues(d3.range(0, 256, 15))); // Добавляем деления по оси X
     
         svg.append("g")
             .attr("class", "y axis")
-            .call(d3.axisLeft(y).ticks(17)); // Добавляем деления по оси Y
+            .call(d3.axisLeft(y).tickValues(d3.range(0, 256, 15))); // Добавляем деления по оси Y
     
         svg.append("text")
             .attr("transform", "rotate(-90)")
@@ -155,6 +157,16 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
     return (
         <form className="curves-modal form" onSubmit={handleSubmit}>
             <svg id="histogram" width="600" height="400"></svg>
+            <div className="curves-modal__table">
+                <h3 className="curves-modal__name curves-modal__name--a">A</h3>
+                <h3 className="curves-modal__name curves-modal__name--b">B</h3>
+                <p className="curves-modal__type">Вход</p>
+                <Input type="number" max={255} min={0} value={inA} onChange={setInA} />
+                <Input type="number" max={255} min={0} value={inB} onChange={setInB} />
+                <p className="curves-modal__type">Выход</p>
+                <Input type="number" max={255} min={0} value={outA} onChange={setOutA} />
+                <Input type="number" max={255} min={0} value={outB} onChange={setOutB} />
+            </div>
             <canvas ref={preview} className="curves-modal__preview"></canvas>
             <TheButton className="form__button" accent={true} onClick={handleCurvesConfirm}>
                 Выполнить

@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import './Input.css';
 
 const Input = ({ type, placeholder, onChange, id, value, min, max, step, w100 }) => {
-    const [content, setContent] = useState(value || '');
+    const [content, setContent] = useState(value);
 
     useEffect(() => {
-        setContent(value || '');
+        setContent(value);
     }, [value]);
 
     const handleChange = (event) => {

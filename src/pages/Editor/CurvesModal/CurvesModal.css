@@ -1,0 +1,23 @@
+.curves-modal__preview {
+    display: none;
+}
+
+.curves-modal__table {
+    display: grid;
+    grid-template-columns: 80px 90px 90px;
+    gap: 10px;
+    /* justify-content: center; */
+    align-items: center;
+    margin: 20px 0;
+}
+
+.curves-modal__name {
+    font-weight: 500;
+    font-size: 16px;
+    text-align: center;
+    margin: 0;
+}
+
+.curves-modal__name--a {
+    grid-column-start: 2;
+}
