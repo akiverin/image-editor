@@ -9,6 +9,7 @@ import Input from '@components/Input/Input';
 
 const CurvesModal = ({ imageCtx, closeModal }) => {
     const { image, setImage } = useContext(ImageContext);
+    const [arrData, setArrData] = useState([]);
     const [inA, setInA] = useState(0);
     const [outA, setOutA] = useState(0);
     const [inB, setInB] = useState(255);
@@ -29,10 +30,11 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         canvasRef.height = imageObj.height;
         ctx.drawImage(imageObj, 0, 0);
         const data = ctx.getImageData(0, 0, imageObj.width, imageObj.height).data;
+        setArrData(data);
         const tempArrR = new Array(256).fill(255);
         const tempArrG = new Array(256).fill(255);
         const tempArrB = new Array(256).fill(255);
-    
+
         for (let i = 0; i < data.length; i += 4) {
             tempArrR[data[i]]++;
             tempArrG[data[i + 1]]++;
@@ -42,20 +44,6 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         setArrR(tempArrR);
         setArrG(tempArrG);
         setArrB(tempArrB);
-
-        // console.log(tempArrR, tempArrG, tempArrB)
-
-        // const combinedArray = [...tempArrR, ...tempArrG, ...tempArrB];
-        // const maxV = Math.max(...combinedArray);
-        // console.log(maxV)
-
-        // for (let i = 0; i < 256; i ++) {
-        //     tempArrR[i] = tempArrR[i] / maxV * 255;
-        //     tempArrG[i] = tempArrG[i] / maxV * 255;
-        //     tempArrB[i] = tempArrB[i] / maxV * 255;
-        // }
-    
-        // buildHistogram(tempArrR, tempArrG, tempArrB);
     }, [imageCtx]);
 
     useEffect(() => {
@@ -66,36 +54,38 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         const tempArrR = arrR.map(val => val / maxV * 255);
         const tempArrG = arrG.map(val => val / maxV * 255);
         const tempArrB = arrB.map(val => val / maxV * 255);
-        
+
+        setInA(inA >= inB ? inB - 1 : inA)
+
         buildHistogram(tempArrR, tempArrG, tempArrB);
     }, [inA, outA, inB, outB, imageCtx, arrR, arrG, arrB]);
-    
+
     const buildHistogram = (dataR, dataG, dataB) => {
         const margin = { top: 20, right: 20, bottom: 50, left: 50 };
-        const width = 600 - margin.left - margin.right;
-        const height = 400 - margin.top - margin.bottom;
-    
+        const width = 500 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
+
         // Очистка SVG
         d3.select("#histogram").selectAll("*").remove();
-    
+
         const svg = d3.select("#histogram")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
+
         const x = d3.scaleLinear()
             .domain([0, 255])
             .range([0, width]);
-    
+
         const y = d3.scaleLinear()
             .domain([0, 255])
             .range([height, 0]);
-    
+
         const color = d3.scaleOrdinal()
             .domain(["dataR", "dataG", "dataB"])
             .range(["red", "green", "blue"]); // Здесь вы можете выбрать любые цвета для каждого массива данных
-    
+
         // Построение линий для цветов RGB с использованием кривой Безье
         svg.append("path")
             .datum(dataR)
@@ -106,7 +96,7 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
                 .x((d, i) => x(i))
                 .y(d => y(d))
                 .curve(d3.curveBasis)); // Используем кривую Безье для плавных линий
-    
+
         svg.append("path")
             .datum(dataG)
             .attr("class", "line")
@@ -116,7 +106,7 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
                 .x((d, i) => x(i))
                 .y(d => y(d))
                 .curve(d3.curveBasis));
-    
+
         svg.append("path")
             .datum(dataB)
             .attr("class", "line")
@@ -126,25 +116,75 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
                 .x((d, i) => x(i))
                 .y(d => y(d))
                 .curve(d3.curveBasis));
-    
+
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x).tickValues(d3.range(0, 256, 15))); // Добавляем деления по оси X
-    
+
         svg.append("g")
             .attr("class", "y axis")
             .call(d3.axisLeft(y).tickValues(d3.range(0, 256, 15))); // Добавляем деления по оси Y
 
-        svg.selectAll(".point")
-            .data([{x: inA, y: outA}, {x: inB, y: outB}])
-            .enter().append("circle")
-            .attr("class", "point")
+        svg.selectAll(".pointA")
+            .data([{ x: inA, y: outA }])
+            .join("circle")
+            .attr("class", "pointA")
             .attr("cx", d => x(d.x))
             .attr("cy", d => y(d.y))
             .attr("r", 5)
-            .style("fill", "currentColor");
-        
+            .style("fill", "currentColor")
+            .style("cursor", "move")
+            .call(d3.drag()
+                .on("start", function () {
+                    d3.select(this).raise().attr("stroke", "red");
+                })
+                .on("drag", function (event) {
+                    const svgElement = document.getElementById("histogram");
+                    const svgRect = svgElement.getBoundingClientRect();
+                    const svgX = event.x - svgRect.left;
+                    const svgY = event.y - svgRect.top;
+                    const newX = Math.max(0, Math.min(inB - 1, x.invert(svgX)));
+                    const newY = Math.max(0, Math.min(255, y.invert(svgY)));
+                    setInA(Math.round(newX));
+                    setOutA(Math.round(newY));
+                })
+                .on("end", function () {
+                    d3.select(this).attr("stroke", null);
+                })
+            );
+
+        svg.selectAll(".pointB")
+            .data([{ x: inB, y: outB }])
+            .join("circle")
+            .attr("class", "pointB")
+            .attr("cx", d => x(d.x))
+            .attr("cy", d => y(d.y))
+            .attr("r", 5)
+            .style("fill", "currentColor")
+            .style("cursor", "move")
+            .call(d3.drag()
+                .on("start", function () {
+                    d3.select(this).raise().attr("stroke", "red");
+                })
+                .on("drag", function (event) {
+                    const svgElement = document.getElementById("histogram");
+                    const svgRect = svgElement.getBoundingClientRect();
+                    const svgX = event.x - svgRect.left;
+                    const svgY = event.y - svgRect.top;
+                    const newX = Math.max(inA + 1, Math.min(255, x.invert(svgX)));
+                    const newY = Math.max(0, Math.min(255, y.invert(svgY)));
+                    d3.select(this)
+                        .attr("cx", x(newX))
+                        .attr("cy", y(newY));
+                    setInB(Math.round(newX));
+                    setOutB(Math.round(newY));
+                })
+                .on("end", function () {
+                    d3.select(this).attr("stroke", null);
+                })
+            );
+
         svg.append("line")
             .attr("class", "line")
             .attr("x1", x(inA))
@@ -162,7 +202,7 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
             .attr("y2", y(outA))
             .style("stroke", "currentColor")
             .style("stroke-width", 1.2);
-        
+
         svg.append("line")
             .attr("class", "line")
             .attr("x1", x(255))
@@ -171,7 +211,7 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
             .attr("y2", y(outB))
             .style("stroke", "currentColor")
             .style("stroke-width", 1.2);
-    
+
         svg.append("text")
             .attr("transform", "rotate(-90)")
             .attr("y", 0 - margin.left)
@@ -180,13 +220,13 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
             .style("text-anchor", "middle")
             .text("Выход") // Текст оси Y
             .style("fill", "currentColor");
-    
+
         svg.append("text")
             .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.top + 20) + ")")
             .style("text-anchor", "middle")
             .text("Вход") // Текст оси X
             .style("fill", "currentColor");
-    
+
         svg.append("text")
             .attr("x", (width / 2))
             .attr("y", 0 - (margin.top / 2))
@@ -196,16 +236,71 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
             .text("RGB Гистограмма")
             .style("fill", "currentColor");
     }
-    
-    
+
+
     const handleSubmit = (event) => {
         event.preventDefault()
-        imageCtx==''&&setImage(imageCtx)
-        imageCtx==''&&closeModal();
+        imageCtx == '' && setImage(imageCtx)
+        imageCtx == '' && closeModal();
     }
 
     const handleCurvesConfirm = () => {
         console.log('Выполнить')
+        console.log('Был ', arrData)
+        const slope = (outB - outA) / (inB - inA);
+        const newData = new Uint8ClampedArray(arrData);
+        console.log(inA, inB, slope)
+        for (let i = 0; i < newData.length; i += 4) {
+            const r = newData[i];
+            const g = newData[i + 1];
+            const b = newData[i + 2];
+
+            if (r < inA) {
+                newData[i] = outA;
+            } else if (r > inB) {
+                newData[i] = outB;
+            } else {
+                newData[i] = Math.round(outA + slope * (r - inA));
+            }
+
+            if (g < inA) {
+                newData[i + 1] = outA;
+            } else if (g > inB) {
+                newData[i + 1] = outB;
+            } else {
+                newData[i + 1] = Math.round(outA + slope * (g - inA));
+            }
+
+            if (b < inA) {
+                newData[i + 2] = outA;
+            } else if (b > inB) {
+                newData[i + 2] = outB;
+            } else {
+                newData[i + 2] = Math.round(outA + slope * (b - inA));
+            }
+        }
+        const img = new Image();
+        img.src = image;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = newData[i];
+                data[i + 1] = newData[i + 1];
+                data[i + 2] = newData[i + 2];
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+            const newImage = canvas.toDataURL('image/jpeg');
+            setImage(newImage);
+            closeModal();
+        };
     }
 
     const handleCurvesReset = () => {
@@ -223,8 +318,8 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
                 <h3 className="curves-modal__name curves-modal__name--a">A</h3>
                 <h3 className="curves-modal__name curves-modal__name--b">B</h3>
                 <p className="curves-modal__type">Вход</p>
-                <Input type="number" max={255} min={0} value={inA} onChange={setInA} />
-                <Input type="number" max={255} min={0} value={inB} onChange={setInB} />
+                <Input type="number" max={inB - 1} min={0} value={inA} onChange={setInA} />
+                <Input type="number" max={255} min={inA + 1} value={inB} onChange={setInB} />
                 <p className="curves-modal__type">Выход</p>
                 <Input type="number" max={255} min={0} value={outA} onChange={setOutA} />
                 <Input type="number" max={255} min={0} value={outB} onChange={setOutB} />
@@ -235,10 +330,10 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
                     Сбросить
                 </TheButton>
                 <TheButton className="curves-modal__button" accent={true} onClick={handleCurvesConfirm}>
-                    Выполнить
+                    Применить
                 </TheButton>
             </div>
-            
+
         </form>
     );
 };

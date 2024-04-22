@@ -8,7 +8,7 @@
   }
 
   .modal--w80 {
-    width: min(80%, 640px, calc(100% - 20px));
+    width: min(80%, 560px, calc(100% - 20px));
 
   }
 

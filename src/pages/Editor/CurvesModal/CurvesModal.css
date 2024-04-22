@@ -1,5 +1,17 @@
+.curves-modal {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .curves-modal__preview {
     display: none;
+}
+
+.curves-modal__preview--active {
+    display: block;
+    
 }
 
 .curves-modal__table {
