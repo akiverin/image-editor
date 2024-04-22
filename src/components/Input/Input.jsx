@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './Input.css';
 
-const Input = ({ type, placeholder, onChange, id, value, min, max, step, w100 }) => {
+const Input = ({ type, placeholder, onChange, id, value, min, max, step, w100, name }) => {
     const [content, setContent] = useState(value);
 
     useEffect(() => {
@@ -13,6 +13,11 @@ const Input = ({ type, placeholder, onChange, id, value, min, max, step, w100 })
         const newValue = event.target.value;
         setContent(newValue);
         type=="number" ? onChange(Number(newValue)) : onChange(newValue);
+        if (type === "checkbox") {
+            onChange(event.target.checked);
+        } else {
+            onChange(newValue);
+        }
     };
 
     return (
@@ -26,6 +31,7 @@ const Input = ({ type, placeholder, onChange, id, value, min, max, step, w100 })
             min={min}
             max={max}
             step={step}
+            name={name}
         />
     );
 };
@@ -43,6 +49,7 @@ Input.propTypes = {
     onChange: PropTypes.func,
     id: PropTypes.string,
     w100: PropTypes.bool,
+    name: PropTypes.string,
 };
 
 export default Input;

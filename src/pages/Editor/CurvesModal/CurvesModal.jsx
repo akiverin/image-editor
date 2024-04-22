@@ -17,6 +17,7 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
     const [arrR, setArrR] = useState([]);
     const [arrG, setArrG] = useState([]);
     const [arrB, setArrB] = useState([]);
+    const [previewActive, setPreviewActive] = useState(false);
     const preview = useRef(null);
 
     useEffect(() => {
@@ -58,6 +59,7 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         setInA(inA >= inB ? inB - 1 : inA)
 
         buildHistogram(tempArrR, tempArrG, tempArrB);
+        handlePreview(previewActive)
     }, [inA, outA, inB, outB, imageCtx, arrR, arrG, arrB]);
 
     const buildHistogram = (dataR, dataG, dataB) => {
@@ -245,8 +247,6 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
     }
 
     const handleCurvesConfirm = () => {
-        console.log('Выполнить')
-        console.log('Был ', arrData)
         const slope = (outB - outA) / (inB - inA);
         const newData = new Uint8ClampedArray(arrData);
         console.log(inA, inB, slope)
@@ -310,21 +310,76 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         setOutB(255);
     }
 
+    const handlePreview = (value) => {
+        setPreviewActive(value);
+        const slope = (outB - outA) / (inB - inA);
+        const newData = new Uint8ClampedArray(arrData);
+        for (let i = 0; i < newData.length; i += 4) {
+            const r = newData[i];
+            const g = newData[i + 1];
+            const b = newData[i + 2];
+
+            if (r < inA) {
+                newData[i] = outA;
+            } else if (r > inB) {
+                newData[i] = outB;
+            } else {
+                newData[i] = Math.round(outA + slope * (r - inA));
+            }
+
+            if (g < inA) {
+                newData[i + 1] = outA;
+            } else if (g > inB) {
+                newData[i + 1] = outB;
+            } else {
+                newData[i + 1] = Math.round(outA + slope * (g - inA));
+            }
+
+            if (b < inA) {
+                newData[i + 2] = outA;
+            } else if (b > inB) {
+                newData[i + 2] = outB;
+            } else {
+                newData[i + 2] = Math.round(outA + slope * (b - inA));
+            }
+        }
+        const img = new Image();
+    img.src = image;
+    const ctx = preview.current.getContext('2d'); // Accessing the canvas using the ref
+    img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            data[i] = newData[i];
+            data[i + 1] = newData[i + 1];
+            data[i + 2] = newData[i + 2];
+        }
+        ctx.putImageData(imageData, 0, 0); // Using putImageData to update canvas content
+    };
+    }
+
 
     return (
         <form className="curves-modal form" onSubmit={handleSubmit}>
             <svg id="histogram" width="600" height="400"></svg>
-            <div className="curves-modal__table">
-                <h3 className="curves-modal__name curves-modal__name--a">A</h3>
-                <h3 className="curves-modal__name curves-modal__name--b">B</h3>
-                <p className="curves-modal__type">Вход</p>
-                <Input type="number" max={inB - 1} min={0} value={inA} onChange={setInA} />
-                <Input type="number" max={255} min={inA + 1} value={inB} onChange={setInB} />
-                <p className="curves-modal__type">Выход</p>
-                <Input type="number" max={255} min={0} value={outA} onChange={setOutA} />
-                <Input type="number" max={255} min={0} value={outB} onChange={setOutB} />
+            <div className="curves-modal__edit">
+                <div className="curves-modal__table">
+                    <h3 className="curves-modal__name curves-modal__name--a">A</h3>
+                    <h3 className="curves-modal__name curves-modal__name--b">B</h3>
+                    <p className="curves-modal__type">Вход</p>
+                    <Input type="number" max={Number(inB) - 1} min={0} value={Number(inA)} onChange={setInA} />
+                    <Input type="number" max={255} min={Number(inA) + 1} value={Number(inB)} onChange={setInB} />
+                    <p className="curves-modal__type">Выход</p>
+                    <Input type="number" max={255} min={0} value={Number(outA)} onChange={setOutA} />
+                    <Input type="number" max={255} min={0} value={Number(outB)} onChange={setOutB} />
+                </div>
+                <div className="curves-modal__settings">
+                    <label htmlFor="previewCheckbox">Предварительный просмотр</label>
+                    <Input type="checkbox" name="previewCheckbox" id="previewCheckbox" onChange={handlePreview} />
+                </div>
             </div>
-            <canvas ref={preview} className="curves-modal__preview"></canvas>
+            <canvas ref={preview} className={previewActive ? "curves-modal__preview--active" : "curves-modal__preview"}></canvas>
             <div className="curves-modal__actions">
                 <TheButton className="curves-modal__button" normal shadow onClick={handleCurvesReset}>
                     Сбросить
