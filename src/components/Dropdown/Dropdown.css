@@ -46,7 +46,7 @@
 }
 
 .dropdown__list {
-    z-index: 3;
+    z-index: 30;
     display: flex;
     width: calc(100% - 14px);
     overflow: scroll;
