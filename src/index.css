@@ -41,6 +41,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background-image: linear-gradient(#FF4D00 -50%, rgb(50, 50, 50) 80%);
+  overflow: hidden;
 }
 
 h1 {

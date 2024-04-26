@@ -6,8 +6,7 @@ import { ImageContext } from '@/ImageProvider';
 import * as d3 from "d3";
 import Input from '@components/Input/Input';
 
-
-const CurvesModal = ({ imageCtx, closeModal }) => {
+const CurvesModal = ({ imageCtx, closeModal, showPreview }) => {
     const { image, setImage } = useContext(ImageContext);
     const [arrData, setArrData] = useState([]);
     const [inA, setInA] = useState(0);
@@ -239,7 +238,6 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
             .style("fill", "currentColor");
     }
 
-
     const handleSubmit = (event) => {
         event.preventDefault()
         imageCtx == '' && setImage(imageCtx)
@@ -249,7 +247,6 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
     const handleCurvesConfirm = () => {
         const slope = (outB - outA) / (inB - inA);
         const newData = new Uint8ClampedArray(arrData);
-        console.log(inA, inB, slope)
         for (let i = 0; i < newData.length; i += 4) {
             const r = newData[i];
             const g = newData[i + 1];
@@ -303,15 +300,7 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
         };
     }
 
-    const handleCurvesReset = () => {
-        setInA(0);
-        setOutA(0);
-        setInB(255);
-        setOutB(255);
-    }
-
-    const handlePreview = (value) => {
-        setPreviewActive(value);
+    const handleCurvesPreview = () => {
         const slope = (outB - outA) / (inB - inA);
         const newData = new Uint8ClampedArray(arrData);
         for (let i = 0; i < newData.length; i += 4) {
@@ -344,21 +333,96 @@ const CurvesModal = ({ imageCtx, closeModal }) => {
             }
         }
         const img = new Image();
-    img.src = image;
-    const ctx = preview.current.getContext('2d'); // Accessing the canvas using the ref
-    img.onload = () => {
-        ctx.drawImage(img, 0, 0);
-        const imageData = ctx.getImageData(0, 0, img.width, img.height);
-        const data = imageData.data;
-        for (let i = 0; i < data.length; i += 4) {
-            data[i] = newData[i];
-            data[i + 1] = newData[i + 1];
-            data[i + 2] = newData[i + 2];
-        }
-        ctx.putImageData(imageData, 0, 0); // Using putImageData to update canvas content
-    };
+        img.src = image;
+        img.onload = () => {
+            const canvas = imageCtx;
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.current
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = newData[i];
+                data[i + 1] = newData[i + 1];
+                data[i + 2] = newData[i + 2];
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+            const newImage = canvas.toDataURL('image/png');
+            ctx.drawImage(newImage, 0, 0);
+        };
     }
 
+    const handleCurvesReset = () => {
+        setInA(0);
+        setOutA(0);
+        setInB(255);
+        setOutB(255);
+    }
+
+    const handlePreview = (value) => {
+        setPreviewActive(value);
+        showPreview(value);
+        if (value) {
+            const slope = (outB - outA) / (inB - inA);
+            const newData = new Uint8ClampedArray(arrData);
+            for (let i = 0; i < newData.length; i += 4) {
+                const r = newData[i];
+                const g = newData[i + 1];
+                const b = newData[i + 2];
+
+                if (r < inA) {
+                    newData[i] = outA;
+                } else if (r > inB) {
+                    newData[i] = outB;
+                } else {
+                    newData[i] = Math.round(outA + slope * (r - inA));
+                }
+
+                if (g < inA) {
+                    newData[i + 1] = outA;
+                } else if (g > inB) {
+                    newData[i + 1] = outB;
+                } else {
+                    newData[i + 1] = Math.round(outA + slope * (g - inA));
+                }
+
+                if (b < inA) {
+                    newData[i + 2] = outA;
+                } else if (b > inB) {
+                    newData[i + 2] = outB;
+                } else {
+                    newData[i + 2] = Math.round(outA + slope * (b - inA));
+                }
+            }
+            const img = new Image();
+            img.src = image;
+            const ctx = preview.current.getContext('2d');
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                const data = imageData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = newData[i];
+                    data[i + 1] = newData[i + 1];
+                    data[i + 2] = newData[i + 2];
+                }
+                ctx.putImageData(imageData, 0, 0);
+            };
+
+            if (value) {
+                handleCurvesPreview()
+            } else {
+                const canvas = imageCtx;
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.current
+                ctx.drawImage(img, 0, 0);
+            }
+        }
+    }
 
     return (
         <form className="curves-modal form" onSubmit={handleSubmit}>
@@ -398,6 +462,7 @@ CurvesModal.propTypes = {
     scaleFactor: PropTypes.number,
     setImage: PropTypes.func,
     closeModal: PropTypes.func,
+    showPreview: PropTypes.func,
 };
 
 export default CurvesModal;

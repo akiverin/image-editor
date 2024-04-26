@@ -31,8 +31,7 @@ const Editor = () => {
     const [imageCoordinatesBase, setImageCoordinatesBase] = useState({ x: 0, y: 0 });
     const [imageCoordinatesExtra, setImageCoordinatesExtra] = useState({ x: 0, y: 0 });
     const [handStep, setHandStep] = useState(10);
-
-
+    const [showBg, setShowBg] = useState(false);
 
     // Работа с модальны окном
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -124,7 +123,7 @@ const Editor = () => {
                 canvasElement.removeEventListener('wheel', handleWheel);
             };
         };
-    }, [image, scaleFactor, canvasTranslation.x, canvasTranslation.y]);
+    }, [image, scaleFactor, canvasTranslation.x, canvasTranslation.y, isModalCurvesOpen]);
 
     const handleCanvasClick = (event) => {
         const canvasRef = canvas.current;
@@ -240,6 +239,11 @@ const Editor = () => {
             document.body.removeChild(a);
         };
     };
+
+    const showPreview = (value) => {
+        console.log(value);
+        setShowBg(value);
+    }
 
     return (
         <section className="editor">
@@ -401,8 +405,8 @@ const Editor = () => {
             <Modal isOpen={isModalOpen} onClose={closeModal} title="Масштабирование изображения">
                 <ScalingModal image={imageObj} setImage={updateImage} closeModal={closeModal} />
             </Modal>
-            <Modal w80 isOpen={isModalCurvesOpen} onClose={closeModal} title="Кривые изображения">
-                {isModalCurvesOpen && <CurvesModal imageCtx={context} setImage={updateImage} closeModal={closeModal} />}
+            <Modal w80 bg0={showBg} isOpen={isModalCurvesOpen} onClose={closeModal} title="Кривые изображения">
+                {isModalCurvesOpen && <CurvesModal imageCtx={context} setImage={updateImage} closeModal={closeModal} showPreview={showPreview} />}
             </Modal>
         </section>
     );

@@ -5,11 +5,39 @@
     padding: 0;
     width: min(64%, 420px, calc(100% - 20px));
     animation: scaleIn 0.4s ease;
+    position: relative;
   }
 
   .modal--w80 {
     width: min(80%, 560px, calc(100% - 20px));
+  }
 
+  .modal--bg0 {
+    &::backdrop {
+      opacity: 0;
+    }
+    box-shadow: 
+      0px 1px 1px 0px #FFFFFF33 inset,
+      0px 6px 12px 0px #FFFFFF1F inset,
+      0px 1px 2px 0px #08080833,
+      0px 4px 4px 0px #08080814;
+  }
+
+  .modal__drag-shape {
+    cursor: move;
+    position: absolute;
+    top: 4px;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    background-color: var(--dark-bg);
+    width: 32px;
+    height: 4px;
+    border-radius: 24px;
+    padding: 0;
+    &:focus {
+      outline: 1px solid white;
+    }
   }
 
   .modal__head {
@@ -94,7 +122,7 @@
     }
 
     .modal__close {
-      background-color: var(--light-gray);
+      background-color: #ededed;
       color: var(--dark-drop);
     }
 

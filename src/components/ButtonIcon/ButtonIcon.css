@@ -17,7 +17,7 @@
     transition: all 200ms ease;
     border-color: transparent;
     &:focus {
-        outline: none;
+        outline: 0.2px solid #adadad;
       }
     &:hover {
       color: white;
