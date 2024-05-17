@@ -1,0 +1,90 @@
+.filter-modal {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.filter-modal__preview {
+    display: none;
+}
+
+.filter-modal__preview--active {
+    display: none;
+    margin-bottom: 20px;
+    position: fixed;
+    max-height: 400px;
+    max-width: min(400px, 20%);
+    right: 0px;
+}
+
+.filter-modal__edit {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.filter-modal__settings {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    line-height: 1.2;
+    & label {
+        cursor: pointer;
+        padding-right: 8px;
+    }
+    & input {
+        cursor: pointer;
+    }
+}
+
+
+
+.filter-modal__table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: start;
+    margin: 20px 0;
+    border: none;
+}
+
+.filter-modal__name {
+    font-weight: 500;
+    font-size: 16px;
+    text-align: center;
+    margin: 0;
+}
+
+.filter-modal__name--a {
+    grid-column-start: 2;
+}
+
+
+
+.filter-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.filter-modal__input {
+    display: flex;
+}
+
+
+.filter-modal__inputs {
+    display: grid;
+    grid-template-columns: 64px 64px 64px;
+    gap: 6px;
+}
+
+.filter-modal__mode {
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    gap: 10px;
+}

@@ -14,6 +14,9 @@
         outline: 1.5px;
         border-color: rgb(67, 67, 67);
     }
+    &[type="radio"]{
+        cursor: pointer;
+    }
 }
 .input--full {
     width: 100%;
